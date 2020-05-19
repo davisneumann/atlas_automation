@@ -1,0 +1,7 @@
+# exclude environment keys
+Env/*
+.DS_Store
+globals.json
+
+# exception to the rule
+!Env/Env_template.json 

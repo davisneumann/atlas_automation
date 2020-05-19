@@ -1,0 +1,39 @@
+{
+	"id": "2389ca7d-11c7-487f-b966-1a242d8a80f3",
+	"name": "Upstart Source Dest",
+	"values": [
+		{
+			"key": "DestUrl",
+			"value": "upstartnetwork.atlassian.net",
+			"enabled": true
+		},
+		{
+			"key": "destAuthToken",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "destUserName",
+			"value": "YOUREMAIL@upstart.com",
+			"enabled": true
+		},
+		{
+			"key": "sourceAuthToken",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "sourceUrl",
+			"value": "upstartnetwork.atlassian.net",
+			"enabled": true
+		},
+		{
+			"key": "sourceUserName",
+			"value": "<YOUR EMAIL>@upstart.com",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2020-05-19T19:15:59.893Z",
+	"_postman_exported_using": "Postman/7.23.0"
+}
