@@ -21,5 +21,5 @@
 
 Running Atlas101
 ```
-docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas101_Upstart.json -e ./env/UpstartEnv.json
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas101.json -e ./env/UpstartEnv.json
 ```
