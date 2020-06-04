@@ -1,0 +1,693 @@
+{
+	"info": {
+		"_postman_id": "ac97d57d-1a80-4b56-ab11-5f1fcb9c1022",
+		"name": "Atlas - OneLogin Offboarding",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Generate OL Tokens",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "957f9bb8-93a7-4865-9ec1-16458786414e",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var temp_OneLogin_token = jsonData.data[0].access_token",
+							"pm.globals.set(\"temp_OL_token\", temp_OneLogin_token)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "client_id:{{client_id}}, client_secret:{{client_secret}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"grant_type\":\"client_credentials\"\n}"
+				},
+				"url": {
+					"raw": "https://api.{{us_or_eu}}.onelogin.com/auth/oauth2/token?grant_type=client_credentials",
+					"protocol": "https",
+					"host": [
+						"api",
+						"{{us_or_eu}}",
+						"onelogin",
+						"com"
+					],
+					"path": [
+						"auth",
+						"oauth2",
+						"token"
+					],
+					"query": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get OL Entitlements Removing Requested",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ff0a5fde-64a2-41f8-9e3b-94d0fa391219",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.variables.set(\"jsonData\",JSON.parse(responseBody));",
+							"",
+							"//write to counsel the jsonData variable",
+							"//console.log(\"Hello\");",
+							"//console.log(jsonData);",
+							"",
+							"//console.log(jsonData.total);",
+							"//console.log(jsonData.issues[1])",
+							"",
+							"",
+							"pm.variables.set(\"loopCount\",0);",
+							"pm.variables.set(\"numOfLoops\",jsonData.issues.length);",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\")",
+							"jsonData.issues.forEach(function(issue)",
+							"{",
+							"    //console.log(issue.key);",
+							"    //if (issue.fields.customfield_10171.accountId !== null){",
+							"         //console.log(issue.fields.assignee.accountId);",
+							"    //    console.log(\"not null\")",
+							"    //}",
+							"    //else{",
+							"    //    console.log(\"null\")",
+							"    //}",
+							"});",
+							"console.log(\"Number of loops to run \" + numOfLoops)",
+							"//console.log(numOfissues);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/search?jql=issuetype%20%3D%20Entitlement%20AND%20project%20%3D%20TEAM%20AND%20status%20%3D%20\"Removal%20Pending\"%20AND%20System%20%3D%20OneLogin%20ORDER%20BY%20priority%20DESC",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"search"
+					],
+					"query": [
+						{
+							"key": "jql",
+							"value": "issuetype%20%3D%20Entitlement%20AND%20project%20%3D%20TEAM%20AND%20status%20%3D%20\"Removal%20Pending\"%20AND%20System%20%3D%20OneLogin%20ORDER%20BY%20priority%20DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Beginning of Loop",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a5c1f187-e351-468c-b183-221f1b9c50a8",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"    pm.globals.set(\"issueKey\", jsonData.issues[loopCount].key)",
+							"    pm.globals.set(\"parentKey\", jsonData.issues[loopCount].fields.parent.key)",
+							"    postman.setNextRequest(\"Transition to Remove\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    pm.variables.set(\"loopCount\",loopCount);    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transition to Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b3e2ba0-29b2-4bab-8ffa-298193c08005",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8b4a7dae-10df-457f-92d4-ea086d54793e",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable": [
+						{
+							"key": "issueIdOrKey",
+							"value": "{{issueKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Person Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "91c0dc0a-ee75-4f95-b638-59fc0dd7d49f",
+						"exec": [
+							"",
+							"//Variables for Testing. Need to be commented out for PROD",
+							"//pm.globals.set(\"personRecordKey\",\"TEAM-1\")",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "259e86df-c25e-4bbc-9b16-9384202d2bd2",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var emailAddy = jsonData.fields.customfield_10115",
+							"pm.globals.set(\"oneloginEmail\", emailAddy)",
+							"console.log(emailAddy)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "",
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman."
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://upstartnetwork.atlassian.net/rest/api/3/issue/{{parentKey}}",
+					"protocol": "https",
+					"host": [
+						"upstartnetwork",
+						"atlassian",
+						"net"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						"{{parentKey}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get OL User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5b76dda5-057d-4100-9f69-dec58cf602a1",
+						"exec": [
+							"// pm.globals.set(\"user_id\", \"47784162\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "edbb1bba-1b7f-49f1-b58f-9c3daa798f9f",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var ol_user_id = jsonData.data[0].id",
+							"pm.globals.set(\"ol_id_user\", ol_user_id)",
+							"console.log(ol_user_id)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{temp_OL_token}}",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer:{{temp_token}}"
+					}
+				],
+				"url": {
+					"raw": "https://{{api-domain}}/api/1/users?email={{oneloginEmail}}",
+					"protocol": "https",
+					"host": [
+						"{{api-domain}}"
+					],
+					"path": [
+						"api",
+						"1",
+						"users"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{oneloginEmail}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set State for a OL User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1dde1cf4-680e-4e78-89da-ba98b902d9e5",
+						"exec": [
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{temp_OL_token}}",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\":2\n}"
+				},
+				"url": {
+					"raw": "https://{{api-domain}}/api/1/users/{{ol_id_user}}",
+					"protocol": "https",
+					"host": [
+						"{{api-domain}}"
+					],
+					"path": [
+						"api",
+						"1",
+						"users",
+						"{{ol_id_user}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End of Loop",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ff08979c-aba8-4b92-bfed-5c93d89bc071",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    //another person record, let's go",
+							"    ",
+							"    console.log(\"Finding if person record has assignee\");",
+							"    console.log(\"Custom field for user: \" + jsonData.issues[loopCount].fields.summary)",
+							"    ",
+							"    ",
+							"    if (jsonData.issues[loopCount].fields.summary.accountId !== null){",
+							"    //console.log(issue.fields.assignee.accountId);",
+							"        postman.setNextRequest(\"Create Atlas 101 Training Checklist\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"    }",
+							"    else",
+							"    {",
+							"        console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"        postman.setNextRequest(\"Beginning of Loop\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"        loopCount=loopCount+1;",
+							"        pm.variables.set(\"loopCount\",loopCount);",
+							"    }",
+							"    ",
+							"    ",
+							"    ",
+							"    //console.log(jsonData.issues[loopCount].key);",
+							"   ",
+							"    //loopCount=loopCount+1;",
+							"    //pm.variables.set(\"loopCount\",loopCount);",
+							"    ",
+							"    //postman.setNextRequest(\"Stub Example\");",
+							"    //pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"    ",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "747d6681-6ffa-4d30-be5a-6ffdc8d4e045",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"loopCount=loopCount+1;",
+							" pm.variables.set(\"loopCount\",loopCount);",
+							" postman.setNextRequest(\"Beginning of Loop\");",
+							" pm.variables.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Transitions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3b84a19c-10df-441b-ae65-b9f200702e7e",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.variables.set(\"jsonData\",JSON.parse(responseBody));",
+							"",
+							"",
+							"//write to counsel the jsonData variable",
+							"//console.log(\"Hello\");",
+							"//console.log(jsonData);",
+							"",
+							"//console.log(jsonData.total);",
+							"//console.log(jsonData.issues[1])",
+							"",
+							"",
+							"pm.variables.set(\"loopCount\",0);",
+							"pm.variables.set(\"numOfLoops\",jsonData.issues.length);",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\")",
+							"jsonData.issues.forEach(function(issue)",
+							"{",
+							"    //console.log(issue.key);",
+							"    //if (issue.fields.customfield_10171.accountId !== null){",
+							"         //console.log(issue.fields.assignee.accountId);",
+							"    //    console.log(\"not null\")",
+							"    //}",
+							"    //else{",
+							"    //    console.log(\"null\")",
+							"    //}",
+							"});",
+							"console.log(\"Number of loops to run \" + numOfLoops)",
+							"//console.log(numOfissues);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable": [
+						{
+							"key": "issueIdOrKey",
+							"value": "TEAM-1044"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
