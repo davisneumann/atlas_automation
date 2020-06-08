@@ -35,14 +35,17 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\"grant_type\":\"client_credentials\"\n}"
+					"raw": "{\n\"grant_type\":\"client_credentials\"\n}",
+					"options": {
+						"raw": {}
+					}
 				},
 				"url": {
-					"raw": "https://api.{{us_or_eu}}.onelogin.com/auth/oauth2/token?grant_type=client_credentials",
+					"raw": "https://api.us.onelogin.com/auth/oauth2/token?grant_type=client_credentials",
 					"protocol": "https",
 					"host": [
 						"api",
-						"{{us_or_eu}}",
+						"us",
 						"onelogin",
 						"com"
 					],
@@ -247,7 +250,13 @@
 					]
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
@@ -274,7 +283,8 @@
 					"variable": [
 						{
 							"key": "issueIdOrKey",
-							"value": "{{issueKey}}"
+							"value": "{{issueKey}}",
+							"type": "string"
 						}
 					]
 				}
@@ -426,10 +436,13 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{api-domain}}/api/1/users?email={{oneloginEmail}}",
+					"raw": "https://api.us.onelogin.com/api/1/users?email={{oneloginEmail}}",
 					"protocol": "https",
 					"host": [
-						"{{api-domain}}"
+						"api",
+						"us",
+						"onelogin",
+						"com"
 					],
 					"path": [
 						"api",
@@ -482,19 +495,25 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"status\":2\n}"
+					"raw": "{\n  \"status\":2\n}",
+					"options": {
+						"raw": {}
+					}
 				},
 				"url": {
-					"raw": "https://{{api-domain}}/api/1/users/{{ol_id_user}}",
+					"raw": "https://api.us.onelogin.com/api/1/users/{{ol_id_user}}",
 					"protocol": "https",
 					"host": [
-						"{{api-domain}}"
+						"api",
+						"us",
+						"onelogin",
+						"com"
 					],
 					"path": [
 						"api",
