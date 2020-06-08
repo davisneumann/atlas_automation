@@ -14,7 +14,7 @@
 		},
 		{
 			"key": "destUserName",
-			"value": "YOUREMAIL@upstart.com",
+			"value": "",
 			"enabled": true
 		},
 		{
@@ -29,7 +29,17 @@
 		},
 		{
 			"key": "sourceUserName",
-			"value": "<YOUR EMAIL>@upstart.com",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "client_id",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "client_secret",
+			"value": "",
 			"enabled": true
 		}
 	],
