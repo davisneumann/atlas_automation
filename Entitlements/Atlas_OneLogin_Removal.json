@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ac97d57d-1a80-4b56-ab11-5f1fcb9c1022",
+		"_postman_id": "13a90fe9-bcce-4d01-9a2d-57338ce708b2",
 		"name": "Atlas - OneLogin Offboarding",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "957f9bb8-93a7-4865-9ec1-16458786414e",
+						"id": "1bca5475-216d-47b9-afdd-69800a7931e2",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"var temp_OneLogin_token = jsonData.data[0].access_token",
@@ -70,7 +70,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ff0a5fde-64a2-41f8-9e3b-94d0fa391219",
+						"id": "d2becc70-0037-426f-860d-d1570348defd",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -151,20 +151,20 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a5c1f187-e351-468c-b183-221f1b9c50a8",
+						"id": "00ec6d82-66ab-4e61-a12d-f896b9db7ada",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
-							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
-							"var jsonData =pm.variables.get(\"jsonData\");",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\");",
+							"var jsonData = pm.variables.get(\"jsonData\");",
 							"",
 							"console.log(loopCount);",
 							"console.log(numOfLoops);",
 							"",
 							"if (loopCount<numOfLoops){",
-							"    console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"    console.log(\"No assignee for \" + jsonData.issues[loopCount].key);",
 							"    pm.globals.set(\"issueKey\", jsonData.issues[loopCount].key)",
 							"    pm.globals.set(\"parentKey\", jsonData.issues[loopCount].fields.parent.key)",
-							"    postman.setNextRequest(\"Transition to Remove\");",
+							"    postman.setNextRequest(\"Get Person Email\");",
 							"    pm.variables.set('goto', 'MyRequest');",
 							"    pm.variables.set(\"loopCount\",loopCount);    ",
 							"}",
@@ -204,100 +204,12 @@
 			"response": []
 		},
 		{
-			"name": "Transition to Remove",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "4b3e2ba0-29b2-4bab-8ffa-298193c08005",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "8b4a7dae-10df-457f-92d4-ea086d54793e",
-						"exec": [
-							"var loopCount = pm.variables.get(\"loopCount\");",
-							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
-							"var jsonData =pm.variables.get(\"jsonData\");",
-							"console.log(loopCount);",
-							"console.log(numOfLoops);",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{sourceAuthToken}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{sourceUserName}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
-					"protocol": "https",
-					"host": [
-						"{{sourceUrl}}"
-					],
-					"path": [
-						"rest",
-						"api",
-						"3",
-						"issue",
-						":issueIdOrKey",
-						"transitions"
-					],
-					"variable": [
-						{
-							"key": "issueIdOrKey",
-							"value": "{{issueKey}}",
-							"type": "string"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Get Person Email",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "91c0dc0a-ee75-4f95-b638-59fc0dd7d49f",
+						"id": "72ba0f04-73df-4d50-bd59-8ab5ff6bdfe7",
 						"exec": [
 							"",
 							"//Variables for Testing. Need to be commented out for PROD",
@@ -310,10 +222,10 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "259e86df-c25e-4bbc-9b16-9384202d2bd2",
+						"id": "f233e6ef-5235-4e28-a7eb-74adcd15c510",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
-							"var emailAddy = jsonData.fields.customfield_10115",
+							"var emailAddy = encodeURI(jsonData.fields.customfield_10115)",
 							"pm.globals.set(\"oneloginEmail\", emailAddy)",
 							"console.log(emailAddy)"
 						],
@@ -391,9 +303,9 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "5b76dda5-057d-4100-9f69-dec58cf602a1",
+						"id": "de7abbf2-4555-4f4c-adf0-1d3e91bde6d2",
 						"exec": [
-							"// pm.globals.set(\"user_id\", \"47784162\");"
+							"// pm.globals.set(\"oneloginEmail\", \"test23@upstart.com\");"
 						],
 						"type": "text/javascript"
 					}
@@ -401,12 +313,27 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "edbb1bba-1b7f-49f1-b58f-9c3daa798f9f",
+						"id": "ab67ca93-5945-4cc9-bfb8-bc81a4059ce5",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
-							"var ol_user_id = jsonData.data[0].id",
-							"pm.globals.set(\"ol_id_user\", ol_user_id)",
-							"console.log(ol_user_id)"
+							"",
+							"if (jsonData.data.length == 0) {",
+							"    console.log(\"Bad Return.\")",
+							"    // this is the end of logic for loop",
+							"    var loopCount = pm.variables.get(\"loopCount\");",
+							"    loopCount=loopCount+1;",
+							"    pm.variables.set(\"loopCount\",loopCount);",
+							"    postman.setNextRequest(\"Beginning of Loop\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"} else {",
+							"    console.log(\"Good Return.\")",
+							"    //.setNextRequest(\"Transition to Remove\");",
+							"    var ol_user_id = jsonData.data[0].id",
+							"    pm.globals.set(\"ol_id_user\", ol_user_id)",
+							"    console.log(ol_user_id)",
+							"}",
+							"",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -460,12 +387,99 @@
 			"response": []
 		},
 		{
+			"name": "Transition to Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dc26dd7c-0c31-4d41-a93f-be955015dbe0",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "397c5dcf-0cac-46c7-b290-94161e8c72d6",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable": [
+						{
+							"key": "issueIdOrKey",
+							"value": "{{issueKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Set State for a OL User",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "1dde1cf4-680e-4e78-89da-ba98b902d9e5",
+						"id": "c6c3320f-5e65-46fe-bd63-e3ca7cfd3789",
 						"exec": [
 							"",
 							"",
@@ -531,7 +545,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ff08979c-aba8-4b92-bfed-5c93d89bc071",
+						"id": "df433b22-fcce-49dd-9e4b-236e6229f019",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
@@ -588,7 +602,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "747d6681-6ffa-4d30-be5a-6ffdc8d4e045",
+						"id": "4c78c1be-3f99-4180-a194-79bdac42c78b",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"loopCount=loopCount+1;",
@@ -629,7 +643,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3b84a19c-10df-441b-ae65-b9f200702e7e",
+						"id": "a84295a3-0dd1-4c28-bada-fadc4abca86b",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
