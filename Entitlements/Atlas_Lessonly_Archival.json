@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "cb2dce35-4806-419c-9957-f1266e18e54a",
+		"name": "Lessonly API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "List Users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6b362f18-0a08-4e21-b784-8118f019d71b",
+						"exec": [
+							"// pm.environment.set(\"lessonly_email\", \"rebecca.sagor@upstart.com\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "797e9d0f-5e63-463e-82c9-e64865b571f5",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"jsonData.users.forEach(userCheck)",
+							"function userCheck(item){",
+							"    for (let [key, value] of Object.entries(item)) {",
+							"        if (value == 'rebecca.sagor@upstart.com') {",
+							"            console.log ('User email found.')",
+							"            var lessonlyID = item.id",
+							"            var lessonlyEmail = item.email",
+							"            console.log(lessonlyID)",
+							"            console.log(lessonlyEmail)",
+							"            pm.globals.set(\"lessonID\", lessonlyID);",
+							"            pm.globals.set(\"lessonEmail\", lessonlyEmail);",
+							"        } else {",
+							"            //console.log('User email not here.')",
+							"        }",
+							"    }",
+							"}",
+							"//var lessID = pm.global.get(\"lessonID\");",
+							"//var lessEmail = pm.global.get(\"lessonEmail\");",
+							"//console.log(lessonID)",
+							"//console.log(lessonEmail)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{lessonlyKey}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{lessonlySD}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "SUBDOMAIN",
+						"type": "text",
+						"value": "{{lessonlySD}}",
+						"disabled": true
+					},
+					{
+						"key": "API_KEY",
+						"type": "text",
+						"value": "{{lessonlyKey}}",
+						"disabled": true
+					},
+					{
+						"key": "{{lessonlySD}}",
+						"type": "text",
+						"value": "{{lessonlyKey}}",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://api.lessonly.com/api/v1/users?per_page=1000",
+					"protocol": "https",
+					"host": [
+						"api",
+						"lessonly",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					],
+					"query": [
+						{
+							"key": "SUBDOMAIN",
+							"value": "{{lessonlySD}}",
+							"disabled": true
+						},
+						{
+							"key": "API_KEY",
+							"value": "{{lessonlyKey}}",
+							"disabled": true
+						},
+						{
+							"key": "per_page",
+							"value": "1000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Archive User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f0c3205a-a1b8-4d19-ad73-4c3cab9b0a49",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4463dec4-cdd1-4b84-9758-0a16ec86f2e7",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(jsonData.email)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{lessonlyKey}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{lessonlySD}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://api.lessonly.com/api/v1/users/:user_id/archive",
+					"protocol": "https",
+					"host": [
+						"api",
+						"lessonly",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						":user_id",
+						"archive"
+					],
+					"variable": [
+						{
+							"key": "user_id",
+							"value": "{{lessonID}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
