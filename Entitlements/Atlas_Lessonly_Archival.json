@@ -6,14 +6,161 @@
 	},
 	"item": [
 		{
-			"name": "List Users",
+			"name": "Get Lessonly Entitlements Removing Requested - Lessonly",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "47cf3f80-fc8e-45c7-998c-e94dceb79c12",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.variables.set(\"jsonData\",JSON.parse(responseBody));",
+							"",
+							"//write to counsel the jsonData variable",
+							"//console.log(\"Hello\");",
+							"//console.log(jsonData);",
+							"",
+							"//console.log(jsonData.total);",
+							"//console.log(jsonData.issues[1])",
+							"",
+							"",
+							"pm.variables.set(\"loopCount\",0);",
+							"pm.variables.set(\"numOfLoops\",jsonData.issues.length);",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\")",
+							"jsonData.issues.forEach(function(issue)",
+							"{",
+							"    //console.log(issue.key);",
+							"    //if (issue.fields.customfield_10171.accountId !== null){",
+							"         //console.log(issue.fields.assignee.accountId);",
+							"    //    console.log(\"not null\")",
+							"    //}",
+							"    //else{",
+							"    //    console.log(\"null\")",
+							"    //}",
+							"});",
+							"console.log(\"Number of loops to run \" + numOfLoops)",
+							"//console.log(numOfissues);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/search?jql=project%20%3D%20TEAM%20AND%20issuetype%20%3D%20\"Entitlement\"%20AND%20status%20in%20(\"Removal%20Pending\")%20And%20(\"Complete%20At%20This%20Time\"%20<%20now()%20OR%20\"Complete%20At%20This%20Time\"%20is%20EMPTY)%20And%20System%20%3D%20\"Lessonly\"%20ORDER%20BY%20cf%5B10020%5D%20ASC",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"search"
+					],
+					"query": [
+						{
+							"key": "jql",
+							"value": "issuetype%20%3D%20Entitlement%20AND%20project%20%3D%20TEAM%20AND%20status%20%3D%20\"Removal%20Pending\"%20AND%20System%20%3D%20OneLogin%20ORDER%20BY%20priority%20DESC",
+							"disabled": true
+						},
+						{
+							"key": "jql",
+							"value": "project%20%3D%20TEAM%20AND%20issuetype%20%3D%20\"Entitlement\"%20AND%20status%20in%20(\"Removal%20Pending\")%20And%20(\"Complete%20At%20This%20Time\"%20<%20now()%20OR%20\"Complete%20At%20This%20Time\"%20is%20EMPTY)%20And%20System%20%3D%20\"Lessonly\"%20ORDER%20BY%20cf%5B10020%5D%20ASC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Beginning of Loop",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "6b362f18-0a08-4e21-b784-8118f019d71b",
+						"id": "0538b962-eafa-467d-b590-fcb7126f094e",
 						"exec": [
-							"// pm.environment.set(\"lessonly_email\", \"rebecca.sagor@upstart.com\");"
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\");",
+							"var jsonData = pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    console.log(\"No assignee for \" + jsonData.issues[loopCount].key);",
+							"    pm.globals.set(\"issueKey\", jsonData.issues[loopCount].key)",
+							"    pm.globals.set(\"parentKey\", jsonData.issues[loopCount].fields.parent.key)",
+							"    postman.setNextRequest(\"Get Person Email\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    pm.variables.set(\"loopCount\",loopCount);    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Person Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "95b7fdd0-379a-4f83-86f7-5accb60008b6",
+						"exec": [
+							"",
+							"//Variables for Testing. Need to be commented out for PROD",
+							"//pm.globals.set(\"parentKey\",\"TEAM-1162\")",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -21,29 +168,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "797e9d0f-5e63-463e-82c9-e64865b571f5",
+						"id": "549ee1e8-3295-49e4-b0b1-5d9cdeb91361",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
-							"jsonData.users.forEach(userCheck)",
-							"function userCheck(item){",
-							"    for (let [key, value] of Object.entries(item)) {",
-							"        if (value == 'chris.bowles@upstart.com') {",
-							"            console.log ('User email found.')",
-							"            var lessonlyID = item.id",
-							"            var lessonlyEmail = item.email",
-							"            console.log(lessonlyID)",
-							"            console.log(lessonlyEmail)",
-							"            pm.globals.set(\"lessonID\", lessonlyID);",
-							"            pm.globals.set(\"lessonEmail\", lessonlyEmail);",
-							"        } else {",
-							"            //console.log('User email not here.')",
-							"        }",
-							"    }",
-							"}",
-							"//var lessID = pm.global.get(\"lessonID\");",
-							"//var lessEmail = pm.global.get(\"lessonEmail\");",
-							"//console.log(lessonID)",
-							"//console.log(lessonEmail)"
+							"var emailAddy = encodeURI(jsonData.fields.customfield_10115)",
+							"pm.globals.set(\"upstartEmail\", emailAddy)",
+							"console.log(emailAddy)"
 						],
 						"type": "text/javascript"
 					}
@@ -58,12 +188,12 @@
 					"basic": [
 						{
 							"key": "password",
-							"value": "{{lessonlyKey}}",
+							"value": "{{sourceAuthToken}}",
 							"type": "string"
 						},
 						{
 							"key": "username",
-							"value": "{{lessonlySD}}",
+							"value": "{{sourceUserName}}",
 							"type": "string"
 						}
 					]
@@ -71,142 +201,57 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "SUBDOMAIN",
+						"key": "Accept",
 						"type": "text",
-						"value": "{{lessonlySD}}",
-						"disabled": true
+						"value": "application/json"
 					},
 					{
-						"key": "API_KEY",
+						"key": "Authorization",
 						"type": "text",
-						"value": "{{lessonlyKey}}",
-						"disabled": true
+						"value": "",
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman."
 					},
 					{
-						"key": "{{lessonlySD}}",
+						"key": "Content-Type",
 						"type": "text",
-						"value": "{{lessonlyKey}}",
-						"disabled": true
+						"value": "application/json"
 					}
 				],
 				"body": {
-					"mode": "formdata",
-					"formdata": [],
+					"mode": "raw",
+					"raw": "",
 					"options": {
-						"formdata": {}
+						"raw": {}
 					}
 				},
 				"url": {
-					"raw": "https://api.lessonly.com/api/v1/users?per_page=1000",
+					"raw": "https://upstartnetwork.atlassian.net/rest/api/3/issue/{{parentKey}}",
 					"protocol": "https",
 					"host": [
-						"api",
-						"lessonly",
-						"com"
+						"upstartnetwork",
+						"atlassian",
+						"net"
 					],
 					"path": [
+						"rest",
 						"api",
-						"v1",
-						"users"
-					],
-					"query": [
-						{
-							"key": "SUBDOMAIN",
-							"value": "{{lessonlySD}}",
-							"disabled": true
-						},
-						{
-							"key": "API_KEY",
-							"value": "{{lessonlyKey}}",
-							"disabled": true
-						},
-						{
-							"key": "per_page",
-							"value": "1000"
-						}
+						"3",
+						"issue",
+						"{{parentKey}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Archive User",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "f0c3205a-a1b8-4d19-ad73-4c3cab9b0a49",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "4463dec4-cdd1-4b84-9758-0a16ec86f2e7",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"console.log(jsonData.email)"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{lessonlyKey}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{lessonlySD}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"url": {
-					"raw": "https://api.lessonly.com/api/v1/users/:user_id/archive",
-					"protocol": "https",
-					"host": [
-						"api",
-						"lessonly",
-						"com"
-					],
-					"path": [
-						"api",
-						"v1",
-						"users",
-						":user_id",
-						"archive"
-					],
-					"variable": [
-						{
-							"key": "user_id",
-							"value": "{{lessonID}}",
-							"type": "string"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List Users Copy",
+			"name": "Get Lessonly User",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"id": "e83acc17-1cb3-4f60-8f76-eeaa54c93542",
 						"exec": [
-							"// pm.environment.set(\"lessonly_email\", \"rebecca.sagor@upstart.com\");"
+							"pm.environment.set(\"upstartEmail\", \"test23@upstart.com\");"
 						],
 						"type": "text/javascript"
 					}
@@ -216,7 +261,26 @@
 					"script": {
 						"id": "4ea0d3dc-f5cc-48dc-840a-bfc428360276",
 						"exec": [
-							"/* var jsonData = JSON.parse(responseBody);",
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(jsonData)",
+							"",
+							"if (jsonData.users.length == 0) {",
+							"    console.log(\"Bad Return.\")",
+							"    // this is the end of logic for loop",
+							"    var loopCount = pm.variables.get(\"loopCount\");",
+							"    loopCount=loopCount+1;",
+							"    pm.variables.set(\"loopCount\",loopCount);",
+							"    postman.setNextRequest(\"Beginning of Loop\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"} else {",
+							"    console.log(\"Good Return.\")",
+							"    //.setNextRequest(\"Transition to Remove\");",
+							"    var lessonly_user_id = jsonData.users[0].id",
+							"    pm.globals.set(\"lessonly_id_user\", lessonly_user_id)",
+							"    console.log(lessonly_user_id)",
+							"}",
+							"",
+							"/*",
 							"jsonData.users.forEach(userCheck)",
 							"function userCheck(item){",
 							"    for (let [key, value] of Object.entries(item)) {",
@@ -290,7 +354,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://api.lessonly.com/api/v1/users?filter[email]=example@upstart.com",
+					"raw": "https://api.lessonly.com/api/v1/users?filter[email]={{upstartEmail}}",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -320,7 +384,404 @@
 						},
 						{
 							"key": "filter[email]",
-							"value": "example@upstart.com"
+							"value": "{{upstartEmail}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Archive User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f0c3205a-a1b8-4d19-ad73-4c3cab9b0a49",
+						"exec": [
+							"pm.globals.set(\"lessonID\", \"7953870\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4463dec4-cdd1-4b84-9758-0a16ec86f2e7",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(jsonData.email)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{lessonlyKey}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{lessonlySD}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://api.lessonly.com/api/v1/users/{{lessonly_id_user}}/archive",
+					"protocol": "https",
+					"host": [
+						"api",
+						"lessonly",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{lessonly_id_user}}",
+						"archive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Lessonly User (Archived)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "51b75b7a-4631-427f-ba93-a6cce3518ff9",
+						"exec": [
+							"pm.environment.set(\"upstartEmail\", \"test23@upstart.com\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e985bd28-3577-4280-9980-8a9e3b760bb2",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(jsonData)",
+							"",
+							"if (jsonData.users[0].archived_at == null) {",
+							"    console.log(\"Not archived.\")",
+							"    // this is the end of logic for loop",
+							"    var loopCount = pm.variables.get(\"loopCount\");",
+							"    loopCount=loopCount+1;",
+							"    pm.variables.set(\"loopCount\",loopCount);",
+							"    postman.setNextRequest(\"Beginning of Loop\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"} else {",
+							"    console.log(\"User is archived.\")",
+							"    //.setNextRequest(\"Transition to Remove\");",
+							"    var lessonly_user_id = jsonData.users[0].id",
+							"    pm.globals.set(\"lessonly_id_user\", lessonly_user_id)",
+							"    console.log(lessonly_user_id)",
+							"}",
+							"",
+							"/*",
+							"jsonData.users.forEach(userCheck)",
+							"function userCheck(item){",
+							"    for (let [key, value] of Object.entries(item)) {",
+							"        if (value == 'chris.bowles@upstart.com') {",
+							"            console.log ('User email found.')",
+							"            var lessonlyID = item.id",
+							"            var lessonlyEmail = item.email",
+							"            console.log(lessonlyID)",
+							"            console.log(lessonlyEmail)",
+							"            pm.globals.set(\"lessonID\", lessonlyID);",
+							"            pm.globals.set(\"lessonEmail\", lessonlyEmail);",
+							"        } else {",
+							"            //console.log('User email not here.')",
+							"        }",
+							"    }",
+							"} */",
+							"//var lessID = pm.global.get(\"lessonID\");",
+							"//var lessEmail = pm.global.get(\"lessonEmail\");",
+							"//console.log(lessonID)",
+							"//console.log(lessonEmail)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{lessonlyKey}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{lessonlySD}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "SUBDOMAIN",
+						"type": "text",
+						"value": "{{lessonlySD}}",
+						"disabled": true
+					},
+					{
+						"key": "API_KEY",
+						"type": "text",
+						"value": "{{lessonlyKey}}",
+						"disabled": true
+					},
+					{
+						"key": "{{lessonlySD}}",
+						"type": "text",
+						"value": "{{lessonlyKey}}",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://api.lessonly.com/api/v1/users?filter[email]={{upstartEmail}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"lessonly",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					],
+					"query": [
+						{
+							"key": "SUBDOMAIN",
+							"value": "{{lessonlySD}}",
+							"disabled": true
+						},
+						{
+							"key": "API_KEY",
+							"value": "{{lessonlyKey}}",
+							"disabled": true
+						},
+						{
+							"key": null,
+							"value": "GET https://api.lessonly.com/api/v1/users?filter[email]=email@example.com  ",
+							"disabled": true
+						},
+						{
+							"key": "filter[email]",
+							"value": "{{upstartEmail}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transition to Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f592cbb-c7d9-41e3-972e-3dce3c465e8a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "67dc1df6-2ea9-4c36-85ff-e6aa28081e43",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable": [
+						{
+							"id": "17e9cb7b-9248-4b1d-9523-9b336dd11c0f",
+							"key": "issueIdOrKey",
+							"value": "{{issueKey}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End of Loop Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f3f5800c-50d1-4ae8-9c4e-b9e90a94a4a3",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    //another person record, let's go",
+							"    ",
+							"    console.log(\"Finding if person record has assignee\");",
+							"    console.log(\"Custom field for user: \" + jsonData.issues[loopCount].fields.summary)",
+							"    ",
+							"    ",
+							"    if (jsonData.issues[loopCount].fields.summary.accountId !== null){",
+							"    //console.log(issue.fields.assignee.accountId);",
+							"        postman.setNextRequest(\"Create Atlas 101 Training Checklist\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"    }",
+							"    else",
+							"    {",
+							"        console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"        postman.setNextRequest(\"Beginning of Loop\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"        loopCount=loopCount+1;",
+							"        pm.variables.set(\"loopCount\",loopCount);",
+							"    }",
+							"    ",
+							"    ",
+							"    ",
+							"    //console.log(jsonData.issues[loopCount].key);",
+							"   ",
+							"    //loopCount=loopCount+1;",
+							"    //pm.variables.set(\"loopCount\",loopCount);",
+							"    ",
+							"    //postman.setNextRequest(\"Stub Example\");",
+							"    //pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"    ",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4e251f53-a678-45bc-86db-49754ec8e7f0",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"loopCount=loopCount+1;",
+							" pm.variables.set(\"loopCount\",loopCount);",
+							" postman.setNextRequest(\"Beginning of Loop\");",
+							" pm.variables.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
 						}
 					]
 				}
