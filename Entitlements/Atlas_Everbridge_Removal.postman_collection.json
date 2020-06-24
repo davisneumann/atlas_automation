@@ -6,7 +6,245 @@
 	},
 	"item": [
 		{
-			"name": "Get Contacts Page 1",
+			"name": "Get EB Entitlements Removing Requested",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3f67c7e1-5158-4ab1-98bd-1f8ed5753c3e",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.variables.set(\"jsonData\",JSON.parse(responseBody));",
+							"",
+							"//write to counsel the jsonData variable",
+							"//console.log(\"Hello\");",
+							"//console.log(jsonData);",
+							"",
+							"//console.log(jsonData.total);",
+							"//console.log(jsonData.issues[1])",
+							"",
+							"",
+							"pm.variables.set(\"loopCount\",0);",
+							"pm.variables.set(\"numOfLoops\",jsonData.issues.length);",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\")",
+							"jsonData.issues.forEach(function(issue)",
+							"{",
+							"    //console.log(issue.key);",
+							"    //if (issue.fields.customfield_10171.accountId !== null){",
+							"         //console.log(issue.fields.assignee.accountId);",
+							"    //    console.log(\"not null\")",
+							"    //}",
+							"    //else{",
+							"    //    console.log(\"null\")",
+							"    //}",
+							"});",
+							"console.log(\"Number of loops to run \" + numOfLoops)",
+							"//console.log(numOfissues);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/search?jql=project%20%3D%20TEAM%20AND%20issuetype%20%3D%20\"Entitlement\"%20AND%20status%20in%20(\"Removal%20Pending\")%20And%20(\"Complete%20At%20This%20Time\"%20<%20now()%20OR%20\"Complete%20At%20This%20Time\"%20is%20EMPTY)%20And%20System%20%3D%20\"Everbridge\"%20ORDER%20BY%20cf%5B10020%5D%20ASC",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"search"
+					],
+					"query": [
+						{
+							"key": "jql",
+							"value": "issuetype%20%3D%20Entitlement%20AND%20project%20%3D%20TEAM%20AND%20status%20%3D%20\"Removal%20Pending\"%20AND%20System%20%3D%20OneLogin%20ORDER%20BY%20priority%20DESC",
+							"disabled": true
+						},
+						{
+							"key": "jql",
+							"value": "project%20%3D%20TEAM%20AND%20issuetype%20%3D%20\"Entitlement\"%20AND%20status%20in%20(\"Removal%20Pending\")%20And%20(\"Complete%20At%20This%20Time\"%20<%20now()%20OR%20\"Complete%20At%20This%20Time\"%20is%20EMPTY)%20And%20System%20%3D%20\"Everbridge\"%20ORDER%20BY%20cf%5B10020%5D%20ASC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Beginning of Loop",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9f6d4a4f-757f-487b-a1d4-6f3c423ccce7",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops = pm.variables.get(\"numOfLoops\");",
+							"var jsonData = pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    console.log(\"No assignee for \" + jsonData.issues[loopCount].key);",
+							"    pm.globals.set(\"issueKey\", jsonData.issues[loopCount].key)",
+							"    pm.globals.set(\"parentKey\", jsonData.issues[loopCount].fields.parent.key)",
+							"    postman.setNextRequest(\"Get Person Email\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    pm.variables.set(\"loopCount\",loopCount);    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Person Email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c8577ff2-8bd9-4150-8644-d7e4f3656fbf",
+						"exec": [
+							"",
+							"//Variables for Testing. Need to be commented out for PROD",
+							"//pm.globals.set(\"personRecordKey\",\"TEAM-1\")",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7b47672e-74fd-4a43-acbf-f4148594497c",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var emailAddy = encodeURI(jsonData.fields.customfield_10115)",
+							"pm.globals.set(\"everbridgeEmail\", emailAddy)",
+							"console.log(emailAddy)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "",
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman."
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://upstartnetwork.atlassian.net/rest/api/3/issue/{{parentKey}}",
+					"protocol": "https",
+					"host": [
+						"upstartnetwork",
+						"atlassian",
+						"net"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						"{{parentKey}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Contacts Page",
 			"event": [
 				{
 					"listen": "test",
@@ -14,10 +252,28 @@
 						"id": "f32dd480-2e69-4642-9075-b187d813865b",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
-							"jsonData.page.data.forEach(userCheck)",
+							"console.log(jsonData)",
+							"",
+							"if (jsonData.result == null) {",
+							"    console.log(\"Bad Return.\")",
+							"    // this is the end of logic for loop",
+							"    var loopCount = pm.variables.get(\"loopCount\");",
+							"    loopCount=loopCount+1;",
+							"    pm.variables.set(\"loopCount\",loopCount);",
+							"    postman.setNextRequest(\"Beginning of Loop\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"} else {",
+							"    console.log(\"Good Return.\")",
+							"    //.setNextRequest(\"Transition to Remove\");",
+							"    var everbridge_user_id = jsonData.result.id",
+							"    pm.globals.set(\"everbridge_id_user\", everbridge_user_id)",
+							"    console.log(everbridge_user_id)",
+							"}",
+							"",
+							"/*jsonData.page.data.forEach(userCheck)",
 							"function userCheck(item){",
 							"    for (let [key, value] of Object.entries(item)) {",
-							"        if (value == 'test22@upstart.com') {",
+							"        if (value == 'test23@upstart.com') {",
 							"            console.log ('User email found.')",
 							"            var everbridgeID = item.id",
 							"            var everbridgeEmail = item.externalId",
@@ -31,7 +287,7 @@
 							"        } ",
 							"    }",
 							"    return;",
-							"}"
+							"}*/"
 						],
 						"type": "text/javascript"
 					}
@@ -56,7 +312,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}?pageNumber=1",
+					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}/{{everbridgeEmail}}?idType=externalId",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -66,7 +322,8 @@
 					"path": [
 						"rest",
 						"contacts",
-						"{{ebOrgID}}"
+						"{{ebOrgID}}",
+						"{{everbridgeEmail}}"
 					],
 					"query": [
 						{
@@ -75,242 +332,8 @@
 							"disabled": true
 						},
 						{
-							"key": "pageNumber",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Contacts Page 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "e47f0ed7-f06d-4638-91ba-0208cf77c4f7",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"jsonData.page.data.forEach(userCheck)",
-							"function userCheck(item){",
-							"    for (let [key, value] of Object.entries(item)) {",
-							"        if (value == 'test22@upstart.com') {",
-							"            console.log ('User email found.')",
-							"            var everbridgeID = item.id",
-							"            var everbridgeEmail = item.externalId",
-							"            console.log(everbridgeID)",
-							"            console.log(everbridgeEmail)",
-							"            pm.globals.set(\"ebID\", everbridgeID);",
-							"            pm.globals.set(\"ebEmail\", everbridgeEmail);",
-							"            break;",
-							"        }else {",
-							"            //console.log('User email not here.')",
-							"        } ",
-							"    }",
-							"    return;",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{ebPW}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{ebUN}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}?pageNumber=2",
-					"protocol": "https",
-					"host": [
-						"api",
-						"everbridge",
-						"net"
-					],
-					"path": [
-						"rest",
-						"contacts",
-						"{{ebOrgID}}"
-					],
-					"query": [
-						{
-							"key": "groupIds",
-							"value": null,
-							"disabled": true
-						},
-						{
-							"key": "pageNumber",
-							"value": "2"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Contacts Page 3",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "a46c8bdb-48ab-4395-ad9d-2cd7535edd18",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"jsonData.page.data.forEach(userCheck)",
-							"function userCheck(item){",
-							"    for (let [key, value] of Object.entries(item)) {",
-							"        if (value == 'test22@upstart.com') {",
-							"            console.log ('User email found.')",
-							"            var everbridgeID = item.id",
-							"            var everbridgeEmail = item.externalId",
-							"            console.log(everbridgeID)",
-							"            console.log(everbridgeEmail)",
-							"            pm.globals.set(\"ebID\", everbridgeID);",
-							"            pm.globals.set(\"ebEmail\", everbridgeEmail);",
-							"            postman.setNextRequest(\"Delete Contact\");",
-							"        }else {",
-							"            //console.log('User email not here.')",
-							"        } ",
-							"    }",
-							"    return;",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{ebPW}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{ebUN}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}?pageNumber=3",
-					"protocol": "https",
-					"host": [
-						"api",
-						"everbridge",
-						"net"
-					],
-					"path": [
-						"rest",
-						"contacts",
-						"{{ebOrgID}}"
-					],
-					"query": [
-						{
-							"key": "groupIds",
-							"value": null,
-							"disabled": true
-						},
-						{
-							"key": "pageNumber",
-							"value": "3"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Contacts Page 4",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "61c70527-bc12-4c6a-9b90-71815de15c0e",
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"jsonData.page.data.forEach(userCheck)",
-							"function userCheck(item){",
-							"    for (let [key, value] of Object.entries(item)) {",
-							"        if (value == 'brian.coan@upstart.com') {",
-							"            console.log ('User email found.')",
-							"            var everbridgeID = item.id",
-							"            var everbridgeEmail = item.externalId",
-							"            console.log(everbridgeID)",
-							"            console.log(everbridgeEmail)",
-							"            pm.globals.set(\"ebID\", everbridgeID);",
-							"            pm.globals.set(\"ebEmail\", everbridgeEmail);",
-							"            break;",
-							"        }else {",
-							"            //console.log('User email not here.')",
-							"        } ",
-							"    }",
-							"    return;",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{ebPW}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{ebUN}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}?pageNumber=4",
-					"protocol": "https",
-					"host": [
-						"api",
-						"everbridge",
-						"net"
-					],
-					"path": [
-						"rest",
-						"contacts",
-						"{{ebOrgID}}"
-					],
-					"query": [
-						{
-							"key": "groupIds",
-							"value": null,
-							"disabled": true
-						},
-						{
-							"key": "pageNumber",
-							"value": "4"
+							"key": "idType",
+							"value": "externalId"
 						}
 					]
 				}
@@ -376,7 +399,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}/{{ebID}}",
+					"raw": "https://api.everbridge.net/rest/contacts/{{ebOrgID}}/{{everbridge_id_user}}",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -387,7 +410,7 @@
 						"rest",
 						"contacts",
 						"{{ebOrgID}}",
-						"{{ebID}}"
+						"{{everbridge_id_user}}"
 					],
 					"query": [
 						{
@@ -399,6 +422,191 @@
 							"key": "",
 							"value": null,
 							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transition to Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "906f1958-b4f9-44e5-b047-b5055b5c2950",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "506b3f2c-9b0d-450f-a823-ec520672c212",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/:issueIdOrKey/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable": [
+						{
+							"key": "issueIdOrKey",
+							"value": "{{issueKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End of Loop",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "83e25f4b-5f95-46c6-9d8b-00f6b75b88d4",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"var jsonData =pm.variables.get(\"jsonData\");",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    //another person record, let's go",
+							"    ",
+							"    console.log(\"Finding if person record has assignee\");",
+							"    console.log(\"Custom field for user: \" + jsonData.issues[loopCount].fields.summary)",
+							"    ",
+							"    ",
+							"    if (jsonData.issues[loopCount].fields.summary.accountId !== null){",
+							"    //console.log(issue.fields.assignee.accountId);",
+							"        postman.setNextRequest(\"Create Atlas 101 Training Checklist\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"    }",
+							"    else",
+							"    {",
+							"        console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"        postman.setNextRequest(\"Beginning of Loop\");",
+							"        pm.variables.set('goto', 'MyRequest');",
+							"        loopCount=loopCount+1;",
+							"        pm.variables.set(\"loopCount\",loopCount);",
+							"    }",
+							"    ",
+							"    ",
+							"    ",
+							"    //console.log(jsonData.issues[loopCount].key);",
+							"   ",
+							"    //loopCount=loopCount+1;",
+							"    //pm.variables.set(\"loopCount\",loopCount);",
+							"    ",
+							"    //postman.setNextRequest(\"Stub Example\");",
+							"    //pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"    ",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a62fc54a-8ca5-4774-aae1-81f252a7cf5b",
+						"exec": [
+							"var loopCount = pm.variables.get(\"loopCount\");",
+							"loopCount=loopCount+1;",
+							" pm.variables.set(\"loopCount\",loopCount);",
+							" postman.setNextRequest(\"Beginning of Loop\");",
+							" pm.variables.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
 						}
 					]
 				}
