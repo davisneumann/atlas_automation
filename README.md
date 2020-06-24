@@ -22,4 +22,33 @@
 Running Atlas101
 ```
 docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas101.json -e ./env/UpstartEnv.json
+
+```
+
+
+Running OneLogin Removal
+```
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_OneLogin_Removal.json -e ./env/UpstartEnv.json
+
+```
+
+Running Lessonly Removal
+```
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Lessonly_Archival.json -e ./env/UpstartEnv.json
+
+```
+
+Running Everbridge Removal
+```
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Everbridge_Removal.json -e ./env/UpstartEnv.json
+
+```
+
+If you want to chain all three together
+
+```
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_OneLogin_Removal.json -e ./env/UpstartEnv.json
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Lessonly_Archival.json -e ./env/UpstartEnv.json
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Everbridge_Removal.json -e ./env/UpstartEnv.json
+
 ```
