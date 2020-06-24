@@ -1,5 +1,5 @@
 {
-	"id": "2389ca7d-11c7-487f-b966-1a242d8a80f3",
+	"id": "cfd155dd-dbd7-4e65-94f5-a3bbb5426a32",
 	"name": "Upstart Source Dest",
 	"values": [
 		{
@@ -9,17 +9,17 @@
 		},
 		{
 			"key": "destAuthToken",
-			"value": "",
+			"value": "enter atlassian api key",
 			"enabled": true
 		},
 		{
 			"key": "destUserName",
-			"value": "",
+			"value": "person.email@upstart.com",
 			"enabled": true
 		},
 		{
 			"key": "sourceAuthToken",
-			"value": "",
+			"value": "enter atlassian api key",
 			"enabled": true
 		},
 		{
@@ -29,21 +29,61 @@
 		},
 		{
 			"key": "sourceUserName",
-			"value": "",
+			"value": "person.email@upstart.com",
+			"enabled": true
+		},
+		{
+			"key": "api-domain",
+			"value": "api.us.onelogin.com",
 			"enabled": true
 		},
 		{
 			"key": "client_id",
-			"value": "",
+			"value": "enter onelogin api key",
 			"enabled": true
 		},
 		{
 			"key": "client_secret",
+			"value": "enter onelogin client secret",
+			"enabled": true
+		},
+		{
+			"key": "us_or_eu",
+			"value": "us",
+			"enabled": true
+		},
+		{
+			"key": "lessonlyKey",
+			"value": "enter lessonly api key",
+			"enabled": true
+		},
+		{
+			"key": "lessonlySD",
+			"value": "upstart",
+			"enabled": true
+		},
+		{
+			"key": "ebUN",
+			"value": "enter the everbridge shared username",
+			"enabled": true
+		},
+		{
+			"key": "ebPW",
+			"value": "enter your everbridge shared password",
+			"enabled": true
+		},
+		{
+			"key": "ebOrgID",
+			"value": "892807736729539",
+			"enabled": true
+		},
+		{
+			"key": "upstartEmail",
 			"value": "",
 			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2020-05-19T19:15:59.893Z",
-	"_postman_exported_using": "Postman/7.23.0"
+	"_postman_exported_at": "2020-06-24T20:59:39.585Z",
+	"_postman_exported_using": "Postman/7.27.0"
 }
