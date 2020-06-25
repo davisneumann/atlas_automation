@@ -6,7 +6,7 @@
 
 1. Git installed: (duh) so you can clone this repo and make updates 
 2. Docker installed and running
-3. Sublime Text: to make edits 
+3. Text Editor (i.e. Sublime Text) to make edits 
 4. Optional: Postman so you can view collections or run them manually
 
 
@@ -14,17 +14,11 @@
  
 - Make a copy of EnvironmentTemplate.json within the env folder
 - Rename the copy to **userEnv.json** (caps matter)
+- In the below commands change UpstartEnv.json to userEnv.json
 - Open new userEnv.json and provide necessary info, which includes the following items:
 
 
-
-
-Running Atlas101
-```
-docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas101.json -e ./env/UpstartEnv.json
-
-```
-
+Offboarding Scripts
 
 Running OneLogin Removal
 ```
@@ -50,5 +44,15 @@ If you want to chain all three together
 docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_OneLogin_Removal.json -e ./env/UpstartEnv.json
 docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Lessonly_Archival.json -e ./env/UpstartEnv.json
 docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/Atlas_Everbridge_Removal.json -e ./env/UpstartEnv.json
+
+```
+
+
+Atlas Scripts - assigns atlas tickets
+
+
+Running Atlas101
+```
+docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas101.json -e ./env/UpstartEnv.json
 
 ```
