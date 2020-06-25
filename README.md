@@ -13,12 +13,11 @@
 ## One time setup (Per Git Clone)
  
 - Make a copy of EnvironmentTemplate.json within the env folder
-- Rename the copy to **userEnv.json** (caps matter)
-- In the below commands change UpstartEnv.json to userEnv.json
-- Open new userEnv.json and provide necessary info, which includes the following items:
+- Rename the copy to **UpstartEnv.json** (caps matter)
+- Open new UpstartEnv.json and provide necessary info (API keys, client id, secret, credential)
 
 
-Offboarding Scripts
+**Offboarding Scripts**
 
 Running OneLogin Removal
 ```
@@ -48,7 +47,7 @@ docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/At
 ```
 
 
-Atlas Scripts - assigns atlas tickets
+**Atlas Scripts - Assigns Atlas Tickets**
 
 
 Running Atlas101
