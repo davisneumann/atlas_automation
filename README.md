@@ -16,8 +16,7 @@
 - Rename the copy to **UpstartEnv.json** (caps matter)
 - Open new UpstartEnv.json and provide necessary info (API keys, client id, secret, credential)
 
-
-**Offboarding Scripts**
+# ***Offboarding Scripts***
 
 Running OneLogin Removal
 ```
