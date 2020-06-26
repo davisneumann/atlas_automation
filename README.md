@@ -46,7 +46,7 @@ docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Entitlements/At
 ```
 
 
-**Atlas Scripts - Assigns Atlas Tickets**
+# ***ATLAS 101 Training***
 
 
 Running Atlas101
