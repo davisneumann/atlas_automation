@@ -1,0 +1,763 @@
+{
+	"info": {
+		"_postman_id": "1d23ac0e-d0d5-4fe0-829b-ccf1a7a1414e",
+		"name": "CreateRevisionPages",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Revisions Awaiting Creation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b0bd5297-adbb-4cdb-92f6-8b12a34304e7",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.globals.set(\"jsonData\",JSON.parse(responseBody));",
+							"",
+							"",
+							"//write to counsel the jsonData variable",
+							"console.log(\"Hello\");",
+							"console.log(jsonData);",
+							"",
+							"console.log(jsonData.total);",
+							"console.log(jsonData.issues[1])",
+							"",
+							"",
+							"pm.globals.set(\"loopCount\",0);",
+							"pm.globals.set(\"numOfLoops\",jsonData.issues.length);",
+							"/*jsonData.issues.forEach(function(issue)",
+							"{",
+							"    //console.log(issue.key);",
+							"    if (issue.fields.customfield_10171.accountId !== null){",
+							"         //console.log(issue.fields.assignee.accountId);",
+							"        console.log(\"not null\")",
+							"    }",
+							"    else{",
+							"        console.log(\"null\")",
+							"    }",
+							"});*/",
+							"",
+							"//console.log(numOfissues);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e1edfa05-f2e4-46f2-9151-5345914e24fc",
+						"exec": [
+							"pm.globals.set(\"jql\", \"project%20%3D%20OPS%20AND%20issuetype%20%3D%20Revision%20AND%20status%20%3D%20\\\"Awaiting%20Page%20Creation\\\"%20ORDER%20BY%20priority%20DESC\" )"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/search?jql={{jql}}",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"search"
+					],
+					"query": [
+						{
+							"key": "jql",
+							"value": "{{jql}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Loop For Each Revision",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0fc83d60-2689-4694-a2d9-71bed19965f9",
+						"exec": [
+							"var loopCount = pm.globals.get(\"loopCount\");",
+							"var numOfLoops =pm.globals.get(\"numOfLoops\");",
+							"var jsonData =pm.globals.get(\"jsonData\");",
+							"",
+							"",
+							"",
+							"",
+							"console.log(loopCount);",
+							"console.log(numOfLoops);",
+							"",
+							"",
+							"",
+							"",
+							"if (loopCount<numOfLoops){",
+							"    //another person record, let's go",
+							"    pm.globals.set(\"artifactKey\",jsonData.issues[loopCount].fields.parent.key)",
+							"    pm.globals.set(\"revisionKey\",jsonData.issues[loopCount].key )",
+							"    pm.globals.set(\"revisionSummary\", jsonData.issues[loopCount].fields.summary)",
+							"    ",
+							"    console.log(\"Going through loop for revision and artifact\");",
+							"    console.log(\"Artifact Key: \" + jsonData.issues[loopCount].fields.parent.key)",
+							"    console.log(\"Revision Key: \" + jsonData.issues[loopCount].key)",
+							"    console.log(\"Revision Summary: \" + jsonData.issues[loopCount].fields.summary)",
+							"    ",
+							"    ",
+							"    if (jsonData.issues[loopCount].fields.parent.key !== null){",
+							"    //console.log(issue.fields.assignee.accountId);",
+							"        //postman.setNextRequest(\"Create Atlas 101 Training Checklist\");",
+							"        //pm.globals.set('goto', 'MyRequest');",
+							"    }",
+							"    else",
+							"    {",
+							"        console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
+							"        postman.setNextRequest(\"Loop For Each Revision\");",
+							"        pm.globals.set('goto', 'MyRequest');",
+							"        loopCount=loopCount+1;",
+							"        pm.globals.set(\"loopCount\",loopCount);",
+							"",
+							"        ",
+							"    }",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    postman.setNextRequest(\"null\");",
+							"    pm.globals.set('goto', 'MyRequest');",
+							"    ",
+							"    ",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Possible Pages That Are Parent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e376cbac-8bd4-474b-8e3c-22f99e9ddb00",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"    //console.log(\"Size of Payload: \",jsonData.size)",
+							"    //console.log(\"Limit of Results: \",jsonData.limit)",
+							"",
+							"pm.globals.set(\"pageSize\", jsonData.size)",
+							"pm.globals.set(\"pageLimit\", jsonData.limit)",
+							"//pm.globals.set(\"webuiArray\",null);",
+							"",
+							"var pageIdArray = [];",
+							"var webuiArray = [];",
+							"",
+							"jsonData.results.forEach(function(pageResult)",
+							"{",
+							"",
+							"   //var myRegex = new RegExp(\"(.+-\\d+):\",\"gm\");//the g caused problems in group return",
+							"   var revKey = pm.globals.get(\"artifactKey\")",
+							"   var myRegex = new RegExp(revKey + \":\");",
+							"   //console.log(\"reveKey: \"  + revKey)",
+							"   ",
+							"   regGroup = (pageResult.title).match(myRegex)",
+							"   //console.log(\"regGroup\" + regGroup)",
+							"   //console.log(regGroup != null)",
+							"   ",
+							"   if(regGroup != null){",
+							"       //console.log(\"Printing group: \" + regGroup[1])",
+							"       pageIdArray.push(pageResult.id)",
+							"       webuiArray.push(pageResult._links.webui)",
+							"   }",
+							"   ",
+							"  ",
+							"});",
+							"",
+							"// console.log(\"Key array: \" +  keyArray)",
+							"// console.log(\"Webuis: \" +  webuiArray)",
+							"",
+							"",
+							"pm.globals.set(\"loopCount\",0);",
+							"//pm.globals.set(\"numOfLoops\",keyArray.length);",
+							"pm.globals.set(\"pageIdArray\",pageIdArray);",
+							"pm.globals.set(\"webuiArray\",webuiArray);",
+							"",
+							"pm.globals.set(\"artifactPageId\",pageIdArray[0]);",
+							"pm.globals.set(\"webui\",webuiArray[0]);",
+							"",
+							"",
+							"",
+							"console.log(\"------------PULLED PAGE----------\")",
+							"console.log(\"Pulled Page. pageLoopCount: \" , pm.globals.get(\"pageLoopCount\"))",
+							"console.log(\"Revision Key: \" , pm.globals.get(\"revisionKey\"))",
+							"console.log(\"pageId array: \" +  pageIdArray)",
+							"console.log(\"Webuis: \" +  webuiArray)",
+							"console.log(\"artifactPageId\" , pm.globals.get(\"artifactPageId\"))",
+							"console.log(\"webui\" , pm.globals.get(\"webui\"))",
+							"console.log(\"Artifact loopCount in this page: \", pm.globals.get(\"loopCount\"))",
+							"console.log(\"numOfLoops: \", pm.globals.get(\"numOfLoops\"))",
+							"console.log(\"setLimit: \", pm.globals.get(\"setLimit\"))",
+							"console.log(\"pageSize: \", pm.globals.get(\"pageSize\"))",
+							"console.log(\"---------------------------------\")",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "013043e9-0d65-44a8-beaf-43d44e1a5568",
+						"exec": [
+							"//debugging",
+							"//pm.globals.set(\"revisionKey\", \"OPS-2\");",
+							"",
+							"pm.globals.set(\"pageStart\", 0)",
+							"pm.globals.set(\"setLimit\", 500)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{DestUrl}}/wiki/rest/api/content/search?cql=title~\"{{artifactKey}}\"&start={{pageStart}}&limit={{setLimit}}",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"search"
+					],
+					"query": [
+						{
+							"key": "cql",
+							"value": "title~\"{{artifactKey}}\""
+						},
+						{
+							"key": "start",
+							"value": "{{pageStart}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{setLimit}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Copy Artifact page",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4e650cf3-e361-4e78-bc92-f511c0266136",
+						"exec": [
+							"//pm.globals.set(\"parentPageId\",null)",
+							"console.log(pm.globals.get(\"parentPageId\"));",
+							"if(pm.globals.get(\"parentPageId\") == null){",
+							"    ",
+							"    console.log(\"No parent Id provided, use Space Home Page as parent\");",
+							"    ",
+							"    //var parentPageId = pm.globals.get(\"homePageId\");",
+							"    pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //console.log(parentPageId);",
+							"    console.log(pm.globals.get(\"parentPageId\"));",
+							"}",
+							"",
+							"//pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") )"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "613a64a7-67d0-4a82-90bc-53f424135bc0",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"revisionPageId\", jsonData.id)",
+							"",
+							"",
+							"",
+							"//replace v1 header",
+							"//.+ac:name=\\\"key\">.+-\\d+<\\/ac:parameter><\\/ac:structured-macro><?\\/?p?>?",
+							"",
+							"////.+ac:name=\\\\\"key\">.+-\\\\d+<\\\\/ac:parameter><\\\\/ac:structured-macro><?\\\\/?p?>?",
+							"",
+							"",
+							"//replace v2 header",
+							"//.+\\/browse\\/.+-\\d+\" data-card-appearance=\"inline\">.+browse\\/.+-\\d+<\\/a><?\\/?p?>?"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pageTitle\": \"{{revisionKey}}:{{revisionSummary}}\",\n  \"copyAttachments\": true,\n  \"copyPermissions\": true,\n  \"copyProperties\": true,\n  \"copyLabels\": true,\n  \"copyCustomContents\": true,\n  \"destination\": {\n    \"type\": \"parent_page\",\n    \"value\": \"471138911\"\n  }\n  \n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{artifactPageId}}/copy/",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{artifactPageId}}",
+						"copy",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Revision And Replace Header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ed412fbc-863d-4881-b648-8361b93ed34f",
+						"exec": [
+							"//Script to clone reports based on a configuration file and key input",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"PageBody\", jsonData.body.storage.value);",
+							"",
+							"",
+							"",
+							"//Getting files to see if we should go to attachments",
+							"//var  stripPatterns = pm.globals.get(\"stripPatterns\").replace(/\\|/g,\",\").split(\",\");",
+							"//var  replacePatterns = pm.globals.get(\"replacePatterns\").replace(/\\|/g,\",\").split(\",\");",
+							"",
+							"var  stripPatterns = pm.globals.get(\"stripPatterns\").split(\"|\");",
+							"var  replacePatterns = pm.globals.get(\"replacePatterns\").split(\"|\");",
+							"",
+							"",
+							"console.log(\"Replace Patterns in Test: \" + replacePatterns)",
+							"var  count = 0; ",
+							"var  pageBody = jsonData.body.storage.value;",
+							"",
+							"",
+							"console.log(\"stripPatterns: \" + stripPatterns)",
+							"",
+							"stripPatterns.forEach(function(stripPattern)",
+							"{",
+							"   ",
+							"   //stripPattern",
+							"   var regStripPattern = new RegExp(stripPattern, 'g');",
+							"   console.log(\"regStripPatter: \" + regStripPattern)",
+							"   regGroup = (pageBody).match(regStripPattern)",
+							"   console.log(\"regex return: \" + regGroup)",
+							"   console.log(regGroup)",
+							"   console.log(\"Replace Patterns in Test: \" + replacePatterns[count])",
+							"   pageBody = pageBody.replace(regStripPattern, replacePatterns[count])",
+							" ",
+							"   count = count +1 ;",
+							"   console.log(\"Printing strip loop count: \" + count)",
+							"});",
+							"",
+							"//this fixes an encoding problem regarding quotes",
+							"pageBody = pageBody.replace(/\"/g, '\\\\\"');",
+							"",
+							"",
+							"pm.globals.set(\"PageBody\", pageBody);",
+							"console.log(pageBody)",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "27a42541-5d88-473d-9425-3e5892241f22",
+						"exec": [
+							"//pm.globals.set(\"revisionPageId\",393971351 )",
+							"",
+							"pm.globals.set(\"stripPatterns\",\".+ac:name=\\\\\\\"key\\\">.+-\\\\d+<\\\\/ac:parameter><\\\\/ac:structured-macro><?\\\\/?p?>?|.+\\/browse\\/.+-\\\\d+.+browse\\\\/.+-\\\\d+<\\\\/a><?\\\\/?p?>?\")",
+							"",
+							"",
+							"var revHeader =\"<p>Revision Tag: <ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"eb318e62-eab9-4a18-8eff-2e1b86e1bd11\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">90739ad2-f189-3f93-b74f-6579ab6a553c</ac:parameter><ac:parameter ac:name=\\\"key\\\">{{revisionKey}}</ac:parameter></ac:structured-macro></p><ac:structured-macro ac:name=\\\"warning\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"b6a1f460-a62c-4142-badc-84daec9ed5d8\\\"><ac:rich-text-body><p>THIS IS NOT A CONTROLLED DOCUMENT AND SHOULD BE USED FOR REVISING CONTENT ONLY.</p></ac:rich-text-body></ac:structured-macro><p><span style=\\\"color: rgb(255,86,48);\\\">See:</span>  <ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"e2e12f2f-f177-41b4-a2fd-367e7dd1aec7\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">90739ad2-f189-3f93-b74f-6579ab6a553c</ac:parameter><ac:parameter ac:name=\\\"key\\\">{{artifactKey}}</ac:parameter></ac:structured-macro><span style=\\\"color: rgb(255,86,48);\\\"> for Controlled Document. </span></p><hr />\"",
+							"",
+							"pm.globals.set(\"replacePatterns\", revHeader +\"|\" +revHeader)",
+							"console.log(\"replacePatterns: \" + pm.globals.get((\"replacePatterns\")))",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{sourceUrl}}/wiki/rest/api/content/{{revisionPageId}}?expand=body.storage",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{revisionPageId}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "body.storage"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Revision With Header",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3fb5f583-dcb6-486c-bada-0763b0a8992e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8743e881-e155-4361-b4d0-bce5cff3bb28",
+						"exec": [
+							"//var jsonData = JSON.parse(responseBody);",
+							"//pm.variables.set(\"pageId\", jsonData.id);",
+							"",
+							"",
+							"//for loop if we need it",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"title\": \"{{revisionKey}}:{{revisionSummary}}\",\n \"type\": \"page\",\n\n \"status\": \"current\",\n \"version\": {\n   \"number\": 2\n },\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id/",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						":id",
+						""
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{revisionPageId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transition to Remove Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cff22368-1c86-41bf-b1e4-c81eafc8ed31",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "99660fc7-6b03-4d15-80aa-1c33648202ca",
+						"exec": [
+							"//var loopCount = pm.variables.get(\"loopCount\");",
+							"//var numOfLoops =pm.variables.get(\"numOfLoops\");",
+							"//var jsonData =pm.variables.get(\"jsonData\");",
+							"//console.log(loopCount);",
+							"//console.log(numOfLoops);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"81\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{sourceUrl}}/rest/api/3/issue/{{revisionKey}}/transitions",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						"{{revisionKey}}",
+						"transitions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End of Loop",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9a2b5626-1451-4fdf-b4de-49c420a3aa9b",
+						"exec": [
+							"var loopCount = pm.globals.get(\"loopCount\");",
+							"",
+							"loopCount=loopCount+1;",
+							" pm.globals.set(\"loopCount\",loopCount);",
+							"",
+							" postman.setNextRequest(\"Loop For Each Revision\");",
+							" pm.globals.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,1042 @@
+{
+	"info": {
+		"_postman_id": "be4dd7e6-1652-4038-8bad-05088204d83c",
+		"name": "Report_Pusher",
+		"description": "Report_Pusher has 3 modes of operations.\n\nThe 3 modes (of polymorphism) make the initial logic complex but will reduce the need to repeat the report create or update, and replacing logic in multiple places.\n\nThe complexity lays in the Pre-script setup that determines what mode to run.\n\nThe modes are:\n\n(1) Push a single report (based on template) to a specific key\n\n(2) Push a single report (based on a template) to a list of specific keys\n\n(3) Push a configuration of reports (SPP) to a specific key",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Template Report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d68b1a20-2db6-4734-803e-04d3ad059e79",
+						"exec": [
+							"//Script to clone reports based on a configuration file and key input",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"PageBody\", jsonData.body.storage.value);",
+							"",
+							"",
+							"",
+							"//Getting files to see if we should go to attachments",
+							"var  stripPatterns = pm.globals.get(\"stripPatterns\").replace(/\\|/g,\",\").split(\",\");",
+							"var  replacePatterns = pm.globals.get(\"replacePatterns\").replace(/\\|/g,\",\").split(\",\");",
+							"var  count = 0; ",
+							"var  pageBody = jsonData.body.storage.value;",
+							"",
+							"",
+							"console.log(\"stripPatterns: \" + stripPatterns)",
+							"",
+							"stripPatterns.forEach(function(stripPattern)",
+							"{",
+							"   ",
+							"   //stripPattern",
+							"   var regStripPattern = new RegExp(stripPattern, 'g');",
+							"   pageBody = pageBody.replace(regStripPattern, replacePatterns[count])",
+							"   ",
+							"   count = count +1 ;",
+							"   console.log(\"Printing strip loop count: \" + count)",
+							"});",
+							"",
+							"//this fixes an encoding problem regarding quotes",
+							"pageBody = pageBody.replace(/\"/g, '\\\\\"');",
+							"",
+							"",
+							"pm.variables.set(\"PageBody\", pageBody);",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "47f72899-135d-494c-91c7-80981dd9922f",
+						"exec": [
+							"//running locals (change to true)",
+							"if(false){",
+							"    pm.globals.set(\"templatePageId\",1376432); ",
+							"    pm.globals.set(\"reportName\",\"API Living\") ;",
+							"    //pm.globals.set(\"stripKey\",\"= XBA\") ;",
+							"    pm.globals.set(\"parent\",\"Home\") ;",
+							"    pm.globals.set(\"files\",\"\");",
+							"    pm.globals.set(\"newJiraKey\", \"EX\" );",
+							"    pm.globals.set(\"newSpaceKey\",\"EX\" );",
+							"    pm.globals.set(\"stripPatterns\",\"= EX|Team Organization\")",
+							"    pm.globals.set(\"replacePatterns\", \"= \\\"{{newJiraKey}}\\\"|Team Roles\")",
+							"   ",
+							"}",
+							"",
+							"if(false){",
+							"    pm.globals.set(\"newJiraKey\", \"TEST\" );",
+							"    pm.globals.set(\"newSpaceKey\",\"TEST\" );",
+							"}",
+							"",
+							"if(false){",
+							"    pm.globals.set(\"templatePageId\",207781935); ",
+							"    pm.globals.set(\"reportName\",\"Living Org Chart\") ;",
+							"    pm.globals.set(\"stripKey\",\"= SPP\") ;",
+							"    pm.globals.set(\"parent\",\"Home\") ;",
+							"    pm.globals.set(\"files\",\"\");",
+							"}",
+							"",
+							"",
+							"",
+							"// Executing some polymorphism ",
+							"// Two types of \"variable sets\"",
+							"// Report TEMPLATE details: templatePageId, reportName, stripKey, parent, files",
+							"// Report DESTINATION details: jiraKey, spaceKey",
+							"// Each \"variable set\" but either be complete in each set. That is what the error conditions are checking",
+							"console.log(pm.info.iteration);",
+							"",
+							"if (Number(pm.info.iteration) ===0){",
+							"",
+							"    var templateDI = (",
+							"        (pm.iterationData.get(\"templatePageId\") != null) && ",
+							"        (pm.iterationData.get(\"reportName\") != null) &&  ",
+							"        //(pm.iterationData.get(\"stripKey\") != null) && ",
+							"        (pm.iterationData.get(\"stripPatterns\") != null) && ",
+							"        (pm.iterationData.get(\"replacePatterns\") != null) && ",
+							"        (pm.iterationData.get(\"parent\") != null)  ",
+							"        )",
+							"    ",
+							"    var templateDI_error = (!templateDI)!=(",
+							"        (pm.iterationData.get(\"templatePageId\") == null) && ",
+							"        (pm.iterationData.get(\"reportName\") == null) &&  ",
+							"        //(pm.iterationData.get(\"stripKey\") == null) && ",
+							"        (pm.iterationData.get(\"stripPatterns\") != null) && ",
+							"        (pm.iterationData.get(\"replacePatterns\") != null) && ",
+							"        (pm.iterationData.get(\"parent\") == null)  ",
+							"        )",
+							"    ",
+							"    var destinationDI = (",
+							"        (pm.iterationData.get(\"newJiraKey\") != null) && ",
+							"        (pm.iterationData.get(\"newSpaceKey\") != null) ",
+							"        )",
+							"    ",
+							"    var destinationDI_error  =(!destinationDI)!= (",
+							"        (pm.iterationData.get(\"newJiraKey\") == null) && ",
+							"        (pm.iterationData.get(\"newSpaceKey\") == null) ",
+							"        )",
+							"    ",
+							"    ///////",
+							"    ///////",
+							"    ",
+							"    var templateGlobals = (",
+							"        (pm.globals.get(\"templatePageId\") != null) && ",
+							"        (pm.globals.get(\"reportName\") != null) &&  ",
+							"        //(pm.globals.get(\"stripKey\") != null) && ",
+							"        (pm.iterationData.get(\"stripPatterns\") != null) && ",
+							"        (pm.iterationData.get(\"replacePatterns\") != null) && ",
+							"        (pm.globals.get(\"parent\") != null)  ",
+							"        )",
+							"    ",
+							"    var templateGlobals_error = (!templateGlobals)!= (",
+							"        (pm.globals.get(\"templatePageId\") == null) && ",
+							"        (pm.globals.get(\"reportName\") == null) &&  ",
+							"        //(pm.globals.get(\"stripKey\") == null) && ",
+							"        (pm.iterationData.get(\"stripPatterns\") != null) && ",
+							"        (pm.iterationData.get(\"replacePatterns\") != null) && ",
+							"        (pm.globals.get(\"parent\") == null)  ",
+							"        ",
+							"       ",
+							"        ",
+							"        )",
+							"        ",
+							"        console.log(\"templatePageId\" +pm.globals.get(\"templatePageId\") )",
+							"        console.log(\"reportName\" +pm.globals.get(\"reportName\") )",
+							"        console.log(\"stripKey\" + pm.globals.get(\"stripKey\"))",
+							"        console.log(\"parent\" + pm.globals.get(\"parent\"))",
+							"        ",
+							"    var destinationGlobals = (",
+							"        (pm.globals.get(\"newJiraKey\") != null) && ",
+							"        (pm.globals.get(\"newSpaceKey\") != null) ",
+							"        )",
+							"    ",
+							"    var destinationGlobals_error = (!destinationGlobals)!= (",
+							"        (pm.globals.get(\"newJiraKey\") == null) && ",
+							"        (pm.globals.get(\"newSpaceKey\") == null) ",
+							"        )",
+							"    ",
+							"    ///////",
+							"    ///////",
+							"    ",
+							"    ",
+							"    console.log(\"templateDI: \",templateDI );",
+							"    console.log(\"templateDI_error: \",templateDI_error);",
+							"    console.log(\"destinationDI: \",destinationDI );",
+							"    console.log(\"destinationDI_error: \",destinationDI_error);",
+							"    ",
+							"    console.log(\"templateGlobals: \",templateGlobals );",
+							"    console.log(\"templateGlobals_error: \",templateGlobals_error);",
+							"    console.log(\"destinationGlobals: \",templateGlobals );",
+							"    console.log(\"destinationGlobals_error: \",templateGlobals_error);",
+							"    ",
+							"    ",
+							"    ",
+							"    pm.globals.set(\"templateDI\",templateDI);",
+							"    pm.globals.set(\"destinationDI\",destinationDI);",
+							"    pm.globals.set(\"templateGlobals\",templateGlobals);",
+							"    pm.globals.set(\"destinationGlobals\",destinationGlobals);",
+							"",
+							"}",
+							"",
+							"if(pm.globals.get(\"templateGlobals\") &&  pm.globals.get(\"destinationDI\")){",
+							"    ",
+							"    //Mode: One report to one location",
+							"    //all set everything is global",
+							"    console.log(\"Report Pusher Mode is One Report to One Location\");",
+							"    ",
+							"}",
+							"else if( pm.globals.get(\"templateDI\") && pm.globals.get(\"destinationGlobals\")){",
+							"    ",
+							"    //Mode: Push from config",
+							"    //setting template as globals now",
+							"    ",
+							"    console.log(\"Report Pusher Mode is Push a Set of Reports to One Key From a Report Config(like SPP)\" );",
+							"    ",
+							"    console.log(\"templateDI and destinationGlobals\")",
+							"    pm.globals.set(\"templatePageId\", (pm.iterationData.get(\"templatePageId\")));",
+							"    console.log(\"template Page Id: \" + pm.globals.get(\"templatePageId\"))",
+							"    pm.globals.set(\"reportName\",(pm.iterationData.get(\"reportName\"))); ",
+							"    //pm.globals.set(\"stripKey\", (pm.iterationData.get(\"stripKey\"))) ;",
+							"    pm.globals.set(\"stripPatterns\", (pm.iterationData.get(\"stripPatterns\"))) ;",
+							"    pm.globals.set(\"replacePatterns\", (pm.iterationData.get(\"replacePatterns\"))) ;",
+							"    pm.globals.set(\"parent\",(pm.iterationData.get(\"parent\"))) ;",
+							"    pm.globals.set(\"files\",(pm.iterationData.get(\"files\"))) ;",
+							"    pm.globals.set(\"Project\",(pm.iterationData.get(\"Project\"))) ;",
+							"}",
+							"else if(pm.globals.get(\"templateGlobals\") && pm.globals.get(\"destinationDI\")){",
+							"    ",
+							"    console.log(\"Report Pusher Mode is Push A Single Report to Multiple Project (e.g Living Org chart to a list of projects\" );",
+							"    ",
+							"    console.log(\"templateGlobals and destinationDi\")",
+							"    //Mode push from project list",
+							"    //setting template as globals now",
+							"    pm.globals.set(\"newJiraKey\",(pm.iterationData.get(\"newJiraKey\"))); ",
+							"    pm.globals.set(\"newSpaceKey\", (pm.iterationData.get(\"newSpaceKey\")));",
+							"",
+							"",
+							"}",
+							"else{",
+							"    console.log(\"Report Pusher Mode is an unexpected state\" );",
+							"    console.log(\"oh no\");",
+							"}",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sourceAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sourceUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{sourceUrl}}/wiki/rest/api/content/{{templatePageId}}?expand=body.storage",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{templatePageId}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "body.storage"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Home Page",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c3629db3-b448-4f9f-a61e-da0d341d955b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "78c89b43-7ea8-40ea-a088-281b3deb65e0",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"parentPageId\", jsonData.homepage.id);",
+							"",
+							"",
+							"var parent = pm.globals.get(\"parent\");",
+							"",
+							"if (parent === \"home\" || parent === \"Home\" || parent ===null || parent ===\"\"){",
+							"    ",
+							"    //parentPageId already set",
+							"    console.log(\"Location is Home\")",
+							"    postman.setNextRequest(\"Find if Report Exists\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"} ",
+							"else if(parent == \"isHome\")",
+							"{",
+							"    console.log(\"Updating Home Parent\");",
+							"    pm.variables.set(\"pageId\", jsonData.homepage.id);",
+							"    pm.variables.set(\"homeName\",jsonData.homepage.title)",
+							"    postman.setNextRequest(\"Get Version of pageID\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"Trying to find Parent\");",
+							"",
+							"    ",
+							"}",
+							"",
+							"",
+							"//pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/space/{{newSpaceKey}}?expand=homepage",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"space",
+						"{{newSpaceKey}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "homepage"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Parent",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a79d276-aa2b-41be-8898-1302551b1f2f",
+						"exec": [
+							"//pm.globals.set(\"reportName\", \"BA Artifact Repository\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5222fe6-21b6-40c4-9a2a-86b117cbfec8",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"//var results = jsonData.results;",
+							"",
+							"//console.log(\"Results:\")",
+							"//console.log(jsonData.results[0].id)",
+							"",
+							"if (jsonData.results.length >= 1){",
+							"    ",
+							"    console.log(\"Page Is Here, pageID Saved\")",
+							"    pm.globals.set(\"parentPageId\", jsonData.results[0].id)",
+							"    ",
+							"} ",
+							"else",
+							"{",
+							"console.log(\"Page Doesn't Exist, using home\")",
+							"  //pm.globals.set(\"parentPageId\", jsonData.homepage.id)",
+							"  pm.globals.set(\"parentPageId\", pm.globals.get(\"pageId\"))",
+							"    ",
+							"}",
+							"",
+							"",
+							"//pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{sourceUrl}}/wiki/rest/api/content/?spaceKey={{newSpaceKey}}&title={{parent}}",
+					"protocol": "https",
+					"host": [
+						"{{sourceUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						""
+					],
+					"query": [
+						{
+							"key": "spaceKey",
+							"value": "{{newSpaceKey}}"
+						},
+						{
+							"key": "title",
+							"value": "{{parent}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find if Report Exists",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a79d276-aa2b-41be-8898-1302551b1f2f",
+						"exec": [
+							"//pm.globals.set(\"reportName\", \"BA Artifact Repository\");",
+							"//pm.globals.set(\"reportName\",encodeURIComponent(pm.globals.get(\"reportName\")))"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5222fe6-21b6-40c4-9a2a-86b117cbfec8",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"//var results = jsonData.results;",
+							"",
+							"//console.log(\"Results:\")",
+							"//console.log(jsonData.results[0].id)",
+							"",
+							"if (jsonData.results.length >= 1){",
+							"    ",
+							"    console.log(\"Page Is Here, pageID Saved\")",
+							"    var pageId = jsonData.results[0].id",
+							"    ",
+							"} ",
+							"else",
+							"{",
+							"    console.log(\"Page Doesn't Exist\")",
+							"    var pageId = 0",
+							"    postman.setNextRequest(\"Create New Report\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"",
+							"",
+							"pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/?spaceKey={{newSpaceKey}}&title={{reportName}}",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						""
+					],
+					"query": [
+						{
+							"key": "spaceKey",
+							"value": "{{newSpaceKey}}"
+						},
+						{
+							"key": "title",
+							"value": "{{reportName}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Version of pageID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0ed38273-fc77-4bb0-b697-10380f4e34d6",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"versionNumber\", jsonData.version.number+1 );",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a1c7f753-462d-4275-bbfb-58abe427eaba",
+						"exec": [
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id?expand=version",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						":id"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "version"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{pageId}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Report",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d05fa91-8505-4472-945d-00104b9b1027",
+						"exec": [
+							"console.log( pm.variables.get(\"homeName\"))",
+							"",
+							"//kind of ahack",
+							"var parent = pm.iterationData.get(\"parent\");",
+							"if(parent ===\"isHome\"){",
+							"    ",
+							"    pm.variables.set(\"reportTitle\", pm.variables.get(\"homeName\"));",
+							"}",
+							"else",
+							"{",
+							"    pm.variables.set(\"reportTitle\", pm.globals.get(\"reportName\"));",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2def12a-28ec-4392-ae03-948f5ffbb720",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"pageId\", jsonData.id);",
+							"",
+							"",
+							"//for loop if we need it",
+							"pm.variables.set(\"attachRun\", 0);",
+							"",
+							"//Getting files to see if we should go to attachments",
+							"var  files =pm.globals.get(\"files\").replace(/\\|/g,\",\").split(\",\");",
+							"",
+							"pm.variables.set(\"attachNum\", files.length);",
+							"",
+							"//any attachments?",
+							"if(files.length>0)",
+							"{",
+							"    console.log(\"yep, let's go load attachments\");",
+							"    postman.setNextRequest(\"POST Attachment\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"no attachments, we end here\");",
+							"    postman.setNextRequest(null);",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							"",
+							"//postman.setNextRequest(null);",
+							"//pm.variables.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"title\": \"{{reportTitle}}\",\n \"type\": \"page\",\n \"space\": {\n   \"key\": \"{{newSpaceKey}}\"\n },\n \"status\": \"current\",\n \"version\": {\n   \"number\": {{versionNumber}}\n },\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id/",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						":id",
+						""
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{pageId}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Report",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d05fa91-8505-4472-945d-00104b9b1027",
+						"exec": [
+							"//pm.globals.set(\"parentPageId\",null)",
+							"console.log(pm.globals.get(\"parentPageId\"));",
+							"if(pm.globals.get(\"parentPageId\") == null){",
+							"    ",
+							"    console.log(\"No parent Id provided, use Space Home Page as parent\");",
+							"    ",
+							"    //var parentPageId = pm.globals.get(\"homePageId\");",
+							"    pm.variables.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //console.log(parentPageId);",
+							"    console.log(pm.variables.get(\"parentPageId\"));",
+							"}",
+							"",
+							"//pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") )"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2def12a-28ec-4392-ae03-948f5ffbb720",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"pageId\", jsonData.id);",
+							"",
+							"//for loop if we need it",
+							"pm.variables.set(\"attachRun\", 0);",
+							"",
+							"",
+							"//Getting files to see if we should go to attachments",
+							"var  files =pm.globals.get(\"files\").replace(/\\|/g,\",\").split(\",\");",
+							"",
+							"pm.variables.set(\"attachNum\", files.length);",
+							"",
+							"//any attachments?",
+							"if(files.length>0)",
+							"{",
+							"    console.log(\"yep, let's go load attachments\");",
+							"    postman.setNextRequest(\"POST Attachment\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"no attachments, we end here\");",
+							"    postman.setNextRequest(null);",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"title\": \"{{reportName}}\",\n \"type\": \"page\",\n \"space\": {\n   \"key\": \"{{newSpaceKey}}\"\n },\n \"status\": \"current\",\n  \"ancestors\": [\n\t{\n\t\"id\": \"{{parentPageId}}\"\n\t}\n\t],\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Attachment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2b3758f0-3196-4ed1-b328-845c140d293d",
+						"exec": [
+							"//1932",
+							"//pm.variables.set(\"pageId\", 193233726);",
+							"",
+							"var  files =pm.globals.get(\"files\").replace(/\\|/g,\",\").split(\",\");",
+							"",
+							"console.log(files[pm.variables.get(\"attachRun\")]);",
+							"",
+							"pm.variables.set(\"file\",files[pm.variables.get(\"attachRun\")]);",
+							"",
+							"console.log(pm.variables.get(\"file\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "892ec510-855d-4a13-bc27-a5278d0ccd5e",
+						"exec": [
+							"",
+							"pm.variables.set(\"attachRun\", pm.variables.get(\"attachRun\")+1);",
+							"",
+							"if(pm.variables.get(\"attachRun\")==pm.variables.get(\"attachNum\"))",
+							"{",
+							"    ",
+							"    console.log(\"done  here\");",
+							"    postman.setNextRequest(null);",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"loop again\");",
+							"    postman.setNextRequest(\"POST Attachment\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Atlassian-Token",
+						"type": "text",
+						"value": "nocheck"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "{{file}}"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{pageId}}/child/attachment",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{pageId}}",
+						"child",
+						"attachment"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "{{status}}",
+							"description": "The status of the content that the attachment is being added to.",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7e76e30e-4ce2-4d44-8d76-1d48aab0d6c1",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a48db7c9-6beb-4210-bfe4-cc31852b9b78",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

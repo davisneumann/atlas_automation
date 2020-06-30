@@ -1,0 +1,838 @@
+{
+	"info": {
+		"_postman_id": "d4d41212-beaa-49c0-883b-c49c33016633",
+		"name": "TestRunPerCase",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "PreCall Variable Init",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5d28c45c-fb5d-44e5-a39e-a5d24183e8c4",
+						"exec": [
+							"//Uncomment below three lines if you are running in Postman and want these values",
+							"/*",
+							"pm.globals.set(\"newSpaceKey\", \"KM\");",
+							"pm.globals.set(\"newJiraKey\", \"KM\");",
+							"pm.globals.set(\"parent\", \"Testing Reports\");",
+							"",
+							"pm.globals.set(\"reportName\", \"Test Runs Per Test Case\");",
+							"pm.globals.set(\"leftCol\", \"Test Case\");",
+							"pm.globals.set(\"rightCol\", \"Test Runs\");",
+							"",
+							"",
+							"",
+							"",
+							"//You can also tweak these, but you can also break the report that way, so do so at your own risk",
+							"pm.globals.set(\"jql\", \"jql=project%20%3D%20\\\"{{newJiraKey}}\\\"%20AND%20issuetype%20in%20(\\\"Test%20Case\\\")%20And%20Status!%3DCanceled%20ORDER%20BY%20cf%5B10009%5D%20%20ASC%20%20%20%20%20\");",
+							"",
+							"",
+							"pm.globals.set(\"serverId\", \"90739ad2-f189-3f93-b74f-6579ab6a553c\")",
+							"",
+							"*/",
+							"",
+							"pm.globals.set(\"tracerow\",\"<tr><td colspan=\\\"1\\\"><ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"8ec87b84-5925-4713-a812-76f39df70bd8\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">{{serverId}}}}</ac:parameter><ac:parameter ac:name=\\\"key\\\">KEY-XXX</ac:parameter></ac:structured-macro></td><td colspan=\\\"1\\\"><ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"f987b11b-c7bc-447a-bbc1-38e29e15b739\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">type,key,summary,status,due date,assignee</ac:parameter><ac:parameter ac:name=\\\"maximumIssues\\\">100</ac:parameter><ac:parameter ac:name=\\\"jqlQuery\\\">parent= KEY-XXX AND issuetype = &quot;Test Run&quot; AND Status != Cancelled ORDER BY Key ASC           </ac:parameter><ac:parameter ac:name=\\\"serverId\\\">{{serverId}}</ac:parameter></ac:structured-macro></td></tr>\");",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"//Setting some initialation items",
+							"pm.variables.set(\"traceallrows\",\"\");",
+							"pm.variables.set(\"loopCount\",0);",
+							"pm.variables.set(\"startAt\",0);",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"//You can also tweak these, but you can also break the report that way, so do so at your own risk",
+							"",
+							"console.log(\"newSpaceKey: \" + pm.globals.get(\"newSpaceKey\"));",
+							"console.log(\"newJiraKey: \" + pm.globals.get(\"newJiraKey\"));",
+							"console.log(\"parent: \" + pm.globals.get(\"parent\"));",
+							"",
+							"console.log(\"reportName: \" + pm.globals.get(\"reportName\"));",
+							"console.log(\"leftCol: \" + pm.globals.get(\"leftCol\"));",
+							"console.log(\"rightCol: \" + pm.globals.get(\"rightCol\"));",
+							"console.log(\"jql: \" + pm.globals.get(\"jql\"));",
+							"console.log(\"serverId: \" + pm.globals.get(\"serverId\"));",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?test=123",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JQL With Pagnation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7922910-ed8d-4201-85ed-50178e070b77",
+						"exec": [
+							"//getting response",
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"//getting postman vars",
+							"var loopCount =pm.variables.get(\"loopCount\");",
+							"console.log(\"loopCount start: \" + loopCount)",
+							"var traceallrows=pm.variables.get(\"traceallrows\");",
+							"",
+							"//looping through each issue",
+							"jsonData.issues.forEach(function(issue)",
+							"{",
+							"    console.log(issue.key);",
+							"    ",
+							"    var tracerow= pm.globals.get(\"tracerow\");",
+							"    ",
+							"    //the example row needs this in it",
+							"    var stripKeyVar = \"KEY-XXX\"",
+							"",
+							"    //convert stripkey string to a regular expression pattern",
+							"    var regStripPattern = new RegExp(stripKeyVar, 'g');",
+							"    ",
+							"    ",
+							"    tracerow=tracerow.replace(regStripPattern,issue.key);",
+							"    ",
+							"    traceallrows=traceallrows+tracerow;",
+							"    ",
+							"   ",
+							"});",
+							"",
+							"//saving row",
+							"pm.variables.set(\"traceallrows\",traceallrows);",
+							"",
+							"//incrementing loop",
+							"loopCount=loopCount+1;",
+							"pm.variables.set(\"loopCount\",loopCount);",
+							"pm.variables.set(\"startAt\",loopCount*jsonData.maxResults);",
+							"",
+							"",
+							"if (loopCount*jsonData.maxResults<jsonData.total){",
+							"    //more records to go, lets go",
+							"    ",
+							"    console.log(\"Looping on Loop Count: \" +loopCount);",
+							"    ",
+							"    //calling self",
+							"    postman.setNextRequest(\"JQL With Pagnation\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"End Of Loop\")",
+							"    ",
+							"    var toprow = \"<p class=\\\"auto-cursor-target\\\"><br /></p><ac:structured-macro ac:name=\\\"panel\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"b5d5f3a6-50d9-4395-8e19-935e21a4eb8a\\\"><ac:parameter ac:name=\\\"borderColor\\\">black</ac:parameter><ac:parameter ac:name=\\\"bgColor\\\">white</ac:parameter><ac:parameter ac:name=\\\"titleColor\\\">#000000</ac:parameter><ac:parameter ac:name=\\\"borderWidth\\\">3</ac:parameter><ac:parameter ac:name=\\\"titleBGColor\\\">#82CAFA</ac:parameter><ac:parameter ac:name=\\\"borderStyle\\\">solid</ac:parameter><ac:parameter ac:name=\\\"title\\\">Test Coverage</ac:parameter><ac:rich-text-body><p class=\\\"auto-cursor-target\\\"><br /></p><table class=\\\"wrapped relative-table\\\" style=\\\"width: 99.999%;\\\"><colgroup><col style=\\\"width: 21.978%;\\\" /><col style=\\\"width: 77.9221%;\\\" /></colgroup><tbody><tr><th>{{leftCol}}</th><th>{{rightCol}}</th></tr>\"",
+							"",
+							"",
+							"",
+							"        var lastrow = \"<tr><td colspan=\\\"1\\\"><br /></td><td colspan=\\\"1\\\"><br /></td></tr></tbody></table><p class=\\\"auto-cursor-target\\\"><br /></p></ac:rich-text-body></ac:structured-macro><p class=\\\"auto-cursor-target\\\"><br /></p><p class=\\\"auto-cursor-target\\\"><br /></p>\"",
+							"        ",
+							"        ",
+							"        var everything = toprow + traceallrows + lastrow;",
+							"        ",
+							"        //this fixes an encoding problem regarding quotes",
+							"        ",
+							"        pm.variables.set(\"PageBody\", everything);",
+							"        ",
+							"        pm.variables.set(\"PageBody\", pm.variables.get(\"PageBody\").replace(/\"/g, '\\\\\"'));",
+							"",
+							"        pm.variables.set(\"PageBody\", pm.variables.get(\"PageBody\").replace(/\\n/g, \"\\\\n\"));",
+							"    ",
+							"}",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/rest/api/3/search?{{jql}}&maxResults=1000&fields=key&startAt={{startAt}}",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"search"
+					],
+					"query": [
+						{
+							"key": "{{jql}}",
+							"value": null
+						},
+						{
+							"key": "maxResults",
+							"value": "1000"
+						},
+						{
+							"key": "fields",
+							"value": "key"
+						},
+						{
+							"key": "startAt",
+							"value": "{{startAt}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Home Page",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c3629db3-b448-4f9f-a61e-da0d341d955b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "78c89b43-7ea8-40ea-a088-281b3deb65e0",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"parentPageId\", jsonData.homepage.id);",
+							"",
+							"",
+							"var parent = pm.globals.get(\"parent\");",
+							"",
+							"if (parent === \"home\" || parent === \"Home\" || parent ===null || parent ===\"\"){",
+							"    ",
+							"    //parentPageId already set",
+							"    console.log(\"Location is Home\")",
+							"    postman.setNextRequest(\"Find if Report Exists\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"} ",
+							"else if(parent == \"isHome\")",
+							"{",
+							"    console.log(\"Updating Home Parent\");",
+							"    pm.variables.set(\"pageId\", jsonData.homepage.id);",
+							"    pm.variables.set(\"homeName\",jsonData.homepage.title)",
+							"    postman.setNextRequest(\"Get Version of pageID\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"else",
+							"{",
+							"    console.log(\"Trying to find Parent\");",
+							"",
+							"    ",
+							"}",
+							"",
+							"",
+							"//pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/space/{{newSpaceKey}}?expand=homepage",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"space",
+						"{{newSpaceKey}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "homepage"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Parent",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a79d276-aa2b-41be-8898-1302551b1f2f",
+						"exec": [
+							"//pm.globals.set(\"reportName\", \"BA Artifact Repository\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5222fe6-21b6-40c4-9a2a-86b117cbfec8",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"//var results = jsonData.results;",
+							"",
+							"//console.log(\"Results:\")",
+							"//console.log(jsonData.results[0].id)",
+							"",
+							"if (jsonData.results.length >= 1){",
+							"    ",
+							"    console.log(\"Page Is Here, pageID Saved\")",
+							"    pm.globals.set(\"parentPageId\", jsonData.results[0].id)",
+							"    ",
+							"} ",
+							"else",
+							"{",
+							"console.log(\"Page Doesn't Exist, using home\")",
+							"  //pm.globals.set(\"parentPageId\", jsonData.homepage.id)",
+							"    ",
+							"}",
+							"",
+							"",
+							"//pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/?spaceKey={{newSpaceKey}}&title={{parent}}",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						""
+					],
+					"query": [
+						{
+							"key": "spaceKey",
+							"value": "{{newSpaceKey}}"
+						},
+						{
+							"key": "title",
+							"value": "{{parent}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find if Report Exists",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a79d276-aa2b-41be-8898-1302551b1f2f",
+						"exec": [
+							"//pm.globals.set(\"reportName\", \"BA Artifact Repository\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e5222fe6-21b6-40c4-9a2a-86b117cbfec8",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"//var results = jsonData.results;",
+							"",
+							"//console.log(\"Results:\")",
+							"//console.log(jsonData.results[0].id)",
+							"",
+							"if (jsonData.results.length >= 1){",
+							"    ",
+							"    console.log(\"Page Is Here, pageID Saved\")",
+							"    var pageId = jsonData.results[0].id",
+							"    ",
+							"} ",
+							"else",
+							"{",
+							"    console.log(\"Page Doesn't Exist\")",
+							"    var pageId = 0",
+							"    postman.setNextRequest(\"Create New Report\");",
+							"    pm.variables.set('goto', 'MyRequest');",
+							"    ",
+							"}",
+							"",
+							"",
+							"pm.variables.set(\"pageId\", pageId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/?spaceKey={{newSpaceKey}}&title={{reportName}}",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						""
+					],
+					"query": [
+						{
+							"key": "spaceKey",
+							"value": "{{newSpaceKey}}"
+						},
+						{
+							"key": "title",
+							"value": "{{reportName}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Version of pageID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0ed38273-fc77-4bb0-b697-10380f4e34d6",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"versionNumber\", jsonData.version.number+1 );",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a1c7f753-462d-4275-bbfb-58abe427eaba",
+						"exec": [
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id?expand=version",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						":id"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "version"
+						}
+					],
+					"variable": [
+						{
+							"id": "905986b7-8a4e-4dce-ab86-ca82df137fbb",
+							"key": "id",
+							"value": "{{pageId}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Report",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d05fa91-8505-4472-945d-00104b9b1027",
+						"exec": [
+							"console.log( pm.variables.get(\"homeName\"))",
+							"",
+							"//kind of ahack",
+							"var parent = pm.globals.get(\"parent\");",
+							"if(parent ===\"isHome\"){",
+							"    ",
+							"    pm.variables.set(\"reportTitle\", pm.variables.get(\"homeName\"));",
+							"}",
+							"else",
+							"{",
+							"    pm.variables.set(\"reportTitle\", pm.globals.get(\"reportName\"));",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2def12a-28ec-4392-ae03-948f5ffbb720",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.variables.set(\"reportId\", jsonData.id);",
+							"",
+							"//postman.setNextRequest(null);",
+							"//Project Status Sub Page 1",
+							"postman.setNextRequest(null);",
+							"pm.variables.set('goto', 'MyRequest');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"title\": \"{{reportTitle}}\",\n \"type\": \"page\",\n \"space\": {\n   \"key\": \"{{newSpaceKey}}\"\n },\n \"status\": \"current\",\n \"version\": {\n   \"number\": {{versionNumber}}\n },\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id/",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						":id",
+						""
+					],
+					"variable": [
+						{
+							"id": "2e299e6d-5447-4d95-ba51-41bf0d55a0f7",
+							"key": "id",
+							"value": "{{pageId}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Report",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d05fa91-8505-4472-945d-00104b9b1027",
+						"exec": [
+							"//pm.globals.set(\"parentPageId\",null)",
+							"console.log(pm.globals.get(\"parentPageId\"));",
+							"if(pm.globals.get(\"parentPageId\") == null){",
+							"    ",
+							"    console.log(\"No parent Id provided, use Space Home Page as parent\");",
+							"    ",
+							"    //var parentPageId = pm.globals.get(\"homePageId\");",
+							"    pm.variables.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
+							"    //console.log(parentPageId);",
+							"    console.log(pm.variables.get(\"parentPageId\"));",
+							"}",
+							"",
+							"//pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") )"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2def12a-28ec-4392-ae03-948f5ffbb720",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"pageId\", jsonData.id);",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"title\": \"{{reportName}}\",\n \"type\": \"page\",\n \"space\": {\n   \"key\": \"{{newSpaceKey}}\"\n },\n \"status\": \"current\",\n  \"ancestors\": [\n\t{\n\t\"id\": \"{{parentPageId}}\"\n\t}\n\t],\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
