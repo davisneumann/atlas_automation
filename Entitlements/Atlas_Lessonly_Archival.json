@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cb2dce35-4806-419c-9957-f1266e18e54a",
+		"_postman_id": "ed390622-61f1-432d-845e-76ba9c635b23",
 		"name": "Lessonly API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "47cf3f80-fc8e-45c7-998c-e94dceb79c12",
+						"id": "432fbe49-2c4c-4a5b-afd7-ef31863f2417",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -97,7 +97,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "0538b962-eafa-467d-b590-fcb7126f094e",
+						"id": "5b21333d-a598-4ed5-9913-639c1ece3958",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"var numOfLoops = pm.variables.get(\"numOfLoops\");",
@@ -155,7 +155,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "95b7fdd0-379a-4f83-86f7-5accb60008b6",
+						"id": "15d720eb-a234-4481-bcfc-78599b487a14",
 						"exec": [
 							"",
 							"//Variables for Testing. Need to be commented out for PROD",
@@ -168,7 +168,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "549ee1e8-3295-49e4-b0b1-5d9cdeb91361",
+						"id": "74643019-70d5-414b-abca-da32641640af",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"var emailAddy = encodeURI(jsonData.fields.customfield_10115)",
@@ -249,9 +249,9 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "e83acc17-1cb3-4f60-8f76-eeaa54c93542",
+						"id": "bfd643ad-00ea-48e6-8439-9de47beb8cdb",
 						"exec": [
-							"pm.environment.set(\"upstartEmail\", \"test23@upstart.com\");"
+							"//pm.environment.set(\"upstartEmail\", \"test23@upstart.com\");"
 						],
 						"type": "text/javascript"
 					}
@@ -259,7 +259,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4ea0d3dc-f5cc-48dc-840a-bfc428360276",
+						"id": "fb147f9d-fcb4-4963-977a-65cd85e1d998",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"console.log(jsonData)",
@@ -397,7 +397,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "f0c3205a-a1b8-4d19-ad73-4c3cab9b0a49",
+						"id": "4b45ba93-2672-4a7f-9de9-d59b5d59c08b",
 						"exec": [
 							"pm.globals.set(\"lessonID\", \"7953870\");"
 						],
@@ -407,7 +407,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4463dec4-cdd1-4b84-9758-0a16ec86f2e7",
+						"id": "a267f8e8-ffc4-498c-92bd-d8cf4931e76c",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"console.log(jsonData.email)"
@@ -459,7 +459,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "51b75b7a-4631-427f-ba93-a6cce3518ff9",
+						"id": "f325c45d-f9cf-4c57-a2d6-9ec386e376a5",
 						"exec": [
 							"pm.environment.set(\"upstartEmail\", \"test23@upstart.com\");"
 						],
@@ -469,7 +469,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e985bd28-3577-4280-9980-8a9e3b760bb2",
+						"id": "35ad876a-0931-4613-86a2-1567d80a1c4d",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"console.log(jsonData)",
@@ -607,7 +607,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8f592cbb-c7d9-41e3-972e-3dce3c465e8a",
+						"id": "60faaabc-c635-4a93-a26f-6fbf6b0bdea2",
 						"exec": [
 							""
 						],
@@ -617,7 +617,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "67dc1df6-2ea9-4c36-85ff-e6aa28081e43",
+						"id": "ce0cee67-d9ab-4feb-a7ab-86ee99fa48b2",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
@@ -680,10 +680,8 @@
 					],
 					"variable": [
 						{
-							"id": "17e9cb7b-9248-4b1d-9523-9b336dd11c0f",
 							"key": "issueIdOrKey",
-							"value": "{{issueKey}}",
-							"type": "string"
+							"value": "{{issueKey}}"
 						}
 					]
 				}
@@ -696,7 +694,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "f3f5800c-50d1-4ae8-9c4e-b9e90a94a4a3",
+						"id": "c879f93a-e1e2-44ef-96a7-f4ebff6aea58",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"var numOfLoops =pm.variables.get(\"numOfLoops\");",
@@ -753,7 +751,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4e251f53-a678-45bc-86db-49754ec8e7f0",
+						"id": "6d4c2b25-a3be-4c39-a78f-845b3f9e8263",
 						"exec": [
 							"var loopCount = pm.variables.get(\"loopCount\");",
 							"loopCount=loopCount+1;",
