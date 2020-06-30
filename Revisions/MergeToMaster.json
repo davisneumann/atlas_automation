@@ -1,17 +1,17 @@
 {
 	"info": {
-		"_postman_id": "1d23ac0e-d0d5-4fe0-829b-ccf1a7a1414e",
-		"name": "CreateRevisionPages",
+		"_postman_id": "84c280a2-159c-49d7-b990-44bdc958073f",
+		"name": "MergeToMaster",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Get Revisions Awaiting Creation",
+			"name": "Get Revisions Approve To Become Officals",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "b0bd5297-adbb-4cdb-92f6-8b12a34304e7",
+						"id": "d7f380f1-4c89-4720-8889-baf728a2f4d5",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"",
@@ -48,9 +48,10 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "e1edfa05-f2e4-46f2-9151-5345914e24fc",
+						"id": "1643d8be-d0b3-48d1-8f3e-e7d2d6abe29d",
 						"exec": [
-							"pm.globals.set(\"jql\", \"project%20%3D%20OPS%20AND%20issuetype%20%3D%20Revision%20AND%20status%20%3D%20\\\"Awaiting%20Page%20Creation\\\"%20ORDER%20BY%20priority%20DESC\" )"
+							"pm.globals.set(\"jql\", ",
+							"\"project%20%3D%20OPS%20AND%20issuetype%20%3D%20Revision%20AND%20status%20%3D%20\\\"Approved%20to%20Become%20Official\\\"%20ORDER%20BY%20priority%20DESC\" )"
 						],
 						"type": "text/javascript"
 					}
@@ -102,7 +103,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "0fc83d60-2689-4694-a2d9-71bed19965f9",
+						"id": "47b8e244-917c-40e8-ad19-62e06839eb47",
 						"exec": [
 							"var loopCount = pm.globals.get(\"loopCount\");",
 							"var numOfLoops =pm.globals.get(\"numOfLoops\");",
@@ -189,7 +190,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e376cbac-8bd4-474b-8e3c-22f99e9ddb00",
+						"id": "5880cd1a-16bf-45f4-9046-0d69de46df11",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"    //console.log(\"Size of Payload: \",jsonData.size)",
@@ -201,6 +202,7 @@
 							"",
 							"var pageIdArray = [];",
 							"var webuiArray = [];",
+							"var artifactTitleArray = [];",
 							"",
 							"jsonData.results.forEach(function(pageResult)",
 							"{",
@@ -218,6 +220,7 @@
 							"       //console.log(\"Printing group: \" + regGroup[1])",
 							"       pageIdArray.push(pageResult.id)",
 							"       webuiArray.push(pageResult._links.webui)",
+							"       artifactTitleArray.push(pageResult.title)",
 							"   }",
 							"   ",
 							"  ",
@@ -231,7 +234,7 @@
 							"//pm.globals.set(\"numOfLoops\",keyArray.length);",
 							"pm.globals.set(\"pageIdArray\",pageIdArray);",
 							"pm.globals.set(\"webuiArray\",webuiArray);",
-							"",
+							"pm.globals.set(\"artifactTitle\",artifactTitleArray[0] )",
 							"pm.globals.set(\"artifactPageId\",pageIdArray[0]);",
 							"pm.globals.set(\"webui\",webuiArray[0]);",
 							"",
@@ -243,6 +246,9 @@
 							"console.log(\"pageId array: \" +  pageIdArray)",
 							"console.log(\"Webuis: \" +  webuiArray)",
 							"console.log(\"artifactPageId\" , pm.globals.get(\"artifactPageId\"))",
+							"console.log(\"artifactTitle: \", artifactTitleArray[0])",
+							"",
+							"",
 							"console.log(\"webui\" , pm.globals.get(\"webui\"))",
 							"console.log(\"Artifact loopCount in this page: \", pm.globals.get(\"loopCount\"))",
 							"console.log(\"numOfLoops: \", pm.globals.get(\"numOfLoops\"))",
@@ -259,7 +265,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "013043e9-0d65-44a8-beaf-43d44e1a5568",
+						"id": "cb649a76-f121-4f32-9a0d-afc74bde2d5a",
 						"exec": [
 							"//debugging",
 							"//pm.globals.set(\"revisionKey\", \"OPS-2\");",
@@ -322,12 +328,150 @@
 			"response": []
 		},
 		{
-			"name": "Copy Artifact page",
+			"name": "All Possible Pages That Are Revision",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9b509e23-be3c-4713-9a42-847484ec8f18",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"    //console.log(\"Size of Payload: \",jsonData.size)",
+							"    //console.log(\"Limit of Results: \",jsonData.limit)",
+							"",
+							"pm.globals.set(\"pageSize\", jsonData.size)",
+							"pm.globals.set(\"pageLimit\", jsonData.limit)",
+							"//pm.globals.set(\"webuiArray\",null);",
+							"",
+							"var pageIdArray = [];",
+							"var webuiArray = [];",
+							"",
+							"jsonData.results.forEach(function(pageResult)",
+							"{",
+							"",
+							"   //var myRegex = new RegExp(\"(.+-\\d+):\",\"gm\");//the g caused problems in group return",
+							"   var revKey = pm.globals.get(\"revisionKey\")",
+							"   var myRegex = new RegExp(revKey + \":\");",
+							"   //console.log(\"reveKey: \"  + revKey)",
+							"   ",
+							"   regGroup = (pageResult.title).match(myRegex)",
+							"   //console.log(\"regGroup\" + regGroup)",
+							"   //console.log(regGroup != null)",
+							"   ",
+							"   if(regGroup != null){",
+							"       //console.log(\"Printing group: \" + regGroup[1])",
+							"       pageIdArray.push(pageResult.id)",
+							"       webuiArray.push(pageResult._links.webui)",
+							"   }",
+							"   ",
+							"  ",
+							"});",
+							"",
+							"// console.log(\"Key array: \" +  keyArray)",
+							"// console.log(\"Webuis: \" +  webuiArray)",
+							"",
+							"",
+							"pm.globals.set(\"loopCount\",0);",
+							"//pm.globals.set(\"numOfLoops\",keyArray.length);",
+							"pm.globals.set(\"pageIdArray\",pageIdArray);",
+							"pm.globals.set(\"webuiArray\",webuiArray);",
+							"",
+							"pm.globals.set(\"revisionPageId\",pageIdArray[0]);",
+							"pm.globals.set(\"webui\",webuiArray[0]);",
+							"",
+							"",
+							"",
+							"console.log(\"------------PULLED PAGE----------\")",
+							"console.log(\"Pulled Page. pageLoopCount: \" , pm.globals.get(\"pageLoopCount\"))",
+							"console.log(\"Revision Key: \" , pm.globals.get(\"revisionKey\"))",
+							"console.log(\"pageId array: \" +  pageIdArray)",
+							"console.log(\"Webuis: \" +  webuiArray)",
+							"console.log(\"revisionPageId\" , pm.globals.get(\"revisionPageId\"))",
+							"console.log(\"webui\" , pm.globals.get(\"webui\"))",
+							"console.log(\"Artifact loopCount in this page: \", pm.globals.get(\"loopCount\"))",
+							"console.log(\"numOfLoops: \", pm.globals.get(\"numOfLoops\"))",
+							"console.log(\"setLimit: \", pm.globals.get(\"setLimit\"))",
+							"console.log(\"pageSize: \", pm.globals.get(\"pageSize\"))",
+							"console.log(\"---------------------------------\")",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e9e4894b-dd2b-4a05-9bd4-5e902c268369",
+						"exec": [
+							"//debugging",
+							"//pm.globals.set(\"revisionKey\", \"OPS-2\");",
+							"",
+							"pm.globals.set(\"pageStart\", 0)",
+							"pm.globals.set(\"setLimit\", 500)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{DestUrl}}/wiki/rest/api/content/search?cql=title~\"{{revisionKey}}\"&start={{pageStart}}&limit={{setLimit}}",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"search"
+					],
+					"query": [
+						{
+							"key": "cql",
+							"value": "title~\"{{revisionKey}}\""
+						},
+						{
+							"key": "start",
+							"value": "{{pageStart}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{setLimit}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Copy Revision Over Artifact",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4e650cf3-e361-4e78-bc92-f511c0266136",
+						"id": "b5c61119-d00c-4a19-95ec-81f467dd7484",
 						"exec": [
 							"//pm.globals.set(\"parentPageId\",null)",
 							"console.log(pm.globals.get(\"parentPageId\"));",
@@ -350,10 +494,10 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "613a64a7-67d0-4a82-90bc-53f424135bc0",
+						"id": "0d9c0f95-a0e7-4a99-ac9f-53ca6f310545",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
-							"pm.globals.set(\"revisionPageId\", jsonData.id)",
+							"//pm.globals.set(\"revisionPageId\", jsonData.id)",
 							"",
 							"",
 							"",
@@ -396,13 +540,13 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"pageTitle\": \"{{revisionKey}}:{{revisionSummary}}\",\n  \"copyAttachments\": true,\n  \"copyPermissions\": true,\n  \"copyProperties\": true,\n  \"copyLabels\": true,\n  \"copyCustomContents\": true,\n  \"destination\": {\n    \"type\": \"parent_page\",\n    \"value\": \"443449702\"\n  }\n  \n}",
+					"raw": "{\n  \"pageTitle\": \"{{artifactTitle}}\",\n  \"copyAttachments\": true,\n  \"copyPermissions\": true,\n  \"copyProperties\": true,\n  \"copyLabels\": true,\n  \"copyCustomContents\": true,\n  \"destination\": {\n    \"type\": \"existing_page\",\n    \"value\": \"{{artifactPageId}}\"\n  }\n  \n}",
 					"options": {
 						"raw": {}
 					}
 				},
 				"url": {
-					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{artifactPageId}}/copy/",
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{revisionPageId}}/copy/",
 					"protocol": "https",
 					"host": [
 						"{{DestUrl}}"
@@ -412,7 +556,7 @@
 						"rest",
 						"api",
 						"content",
-						"{{artifactPageId}}",
+						"{{revisionPageId}}",
 						"copy",
 						""
 					]
@@ -421,12 +565,128 @@
 			"response": []
 		},
 		{
-			"name": "Get Revision And Replace Header",
+			"name": "Get Confluence Version",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9524e566-652e-48a2-97a0-55e2012cef1d",
+						"exec": [
+							"//testing",
+							"//pm.globals.set(\"testPageId\",375655773 )",
+							"//pm.globals.set(\"testPageId\",528286164 )"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "595fdd57-ceaa-47ea-a766-e4896861cad9",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"//pm.globals.set(\"editorVersion\", jsonData.version.number)",
+							"//console.log(\"Confluence version: \" + jsonData.version.number )",
+							"",
+							"if(jsonData.metadata.properties.editor == null){",
+							"    console.log(\"It's null, brother, confluence v1\")",
+							"    pm.globals.set(\"editorVersion\", 1)",
+							"}",
+							"else",
+							"{",
+							"    if(jsonData.metadata.properties.editor.value == \"v2\"){",
+							"        console.log(\"confluence v2\")",
+							"        pm.globals.set(\"editorVersion\", 2)",
+							"    }",
+							"    else{",
+							"         console.log(\"had confluence editor but not 2 \")",
+							"        pm.globals.set(\"editorVersion\", 1)",
+							"    }",
+							"console.log(\"It's here\")",
+							"}",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{artifactPageId}}?expand=metadata.properties.editor",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{artifactPageId}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "metadata.properties.editor"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Header From Artifact",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "ed412fbc-863d-4881-b648-8361b93ed34f",
+						"id": "29a374bd-c5ce-477c-bdaa-a2c8068d3446",
 						"exec": [
 							"//Script to clone reports based on a configuration file and key input",
 							"",
@@ -486,16 +746,30 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "27a42541-5d88-473d-9425-3e5892241f22",
+						"id": "4b833ac4-e173-42e7-9f2f-5c0d710fd2aa",
 						"exec": [
 							"//pm.globals.set(\"revisionPageId\",393971351 )",
 							"",
-							"pm.globals.set(\"stripPatterns\",\".+ac:name=\\\\\\\"key\\\">.+-\\\\d+<\\\\/ac:parameter><\\\\/ac:structured-macro><?\\\\/?p?>?|.+\\/browse\\/.+-\\\\d+.+browse\\\\/.+-\\\\d+<\\\\/a><?\\\\/?p?>?\")",
+							"//stripping out Revision control header",
+							"pm.globals.set(\"stripPatterns\",\"[\\\\s\\\\S]+for Controlled Document. <\\/span><\\/p>\\n?<hr \\/>\")",
+							"",
+							"//one that didn't work",
+							"//(.|\\\\n)+for Controlled Document. <\\\\/span><\\\\/p>\\\\n?<hr \\\\/>",
 							"",
 							"",
-							"var revHeader =\"<p>Revision Tag: <ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"eb318e62-eab9-4a18-8eff-2e1b86e1bd11\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">90739ad2-f189-3f93-b74f-6579ab6a553c</ac:parameter><ac:parameter ac:name=\\\"key\\\">{{revisionKey}}</ac:parameter></ac:structured-macro></p><ac:structured-macro ac:name=\\\"warning\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"b6a1f460-a62c-4142-badc-84daec9ed5d8\\\"><ac:rich-text-body><p>THIS IS NOT A CONTROLLED DOCUMENT AND SHOULD BE USED FOR REVISING CONTENT ONLY.</p></ac:rich-text-body></ac:structured-macro><p><span style=\\\"color: rgb(255,86,48);\\\">See:</span>  <ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"e2e12f2f-f177-41b4-a2fd-367e7dd1aec7\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">90739ad2-f189-3f93-b74f-6579ab6a553c</ac:parameter><ac:parameter ac:name=\\\"key\\\">{{artifactKey}}</ac:parameter></ac:structured-macro><span style=\\\"color: rgb(255,86,48);\\\"> for Controlled Document. </span></p><hr />\"",
+							"var oldConfHeader =\"<p>Artifact Tag:&nbsp;&nbsp;<ac:structured-macro ac:name=\\\"jira\\\" ac:schema-version=\\\"1\\\" ac:macro-id=\\\"e40e412b-adef-4d8f-8c5b-321da17c5765\\\"><ac:parameter ac:name=\\\"server\\\">System JIRA</ac:parameter><ac:parameter ac:name=\\\"columns\\\">key,summary,type,created,updated,due,assignee,reporter,priority,status,resolution</ac:parameter><ac:parameter ac:name=\\\"serverId\\\">90739ad2-f189-3f93-b74f-6579ab6a553c</ac:parameter><ac:parameter ac:name=\\\"key\\\">{{artifactKey}}</ac:parameter></ac:structured-macro></p>\"",
 							"",
-							"pm.globals.set(\"replacePatterns\", revHeader +\"|\" +revHeader)",
+							"var newConfHeader =\"<p>Artifact Tag: <a href=\\\"https://upstartnetwork.atlassian.net/browse/{{artifactKey}}\\\" data-card-appearance=\\\"inline\\\">https://upstartnetwork.atlassian.net/browse/{{artifactKey}}</a></p>\"",
+							"",
+							"if (pm.globals.get(\"editorVersion\") == 2){",
+							"    var artifactHeader = newConfHeader",
+							"}",
+							"else",
+							"{",
+							"    var artifactHeader = oldConfHeader",
+							"}",
+							"",
+							"pm.globals.set(\"replacePatterns\", artifactHeader)",
 							"console.log(\"replacePatterns: \" + pm.globals.get((\"replacePatterns\")))",
 							""
 						],
@@ -528,7 +802,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{sourceUrl}}/wiki/rest/api/content/{{revisionPageId}}?expand=body.storage",
+					"raw": "https://{{sourceUrl}}/wiki/rest/api/content/{{artifactPageId}}?expand=body.storage",
 					"protocol": "https",
 					"host": [
 						"{{sourceUrl}}"
@@ -538,7 +812,7 @@
 						"rest",
 						"api",
 						"content",
-						"{{revisionPageId}}"
+						"{{artifactPageId}}"
 					],
 					"query": [
 						{
@@ -551,12 +825,88 @@
 			"response": []
 		},
 		{
+			"name": "Get Version of Artifact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b9738a9f-7342-400d-9bdf-a907023b481c",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.globals.set(\"versionNumber\", jsonData.version.number+1 );",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7f339d7c-67ff-452f-9777-513e6cb4f599",
+						"exec": [
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{destAuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{destUserName}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{artifactPageId}}?expand=version",
+					"protocol": "https",
+					"host": [
+						"{{DestUrl}}"
+					],
+					"path": [
+						"wiki",
+						"rest",
+						"api",
+						"content",
+						"{{artifactPageId}}"
+					],
+					"query": [
+						{
+							"key": "expand",
+							"value": "version"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Update Revision With Header",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "3fb5f583-dcb6-486c-bada-0763b0a8992e",
+						"id": "fa7c9077-1011-457e-8534-f0642414a0dc",
 						"exec": [
 							""
 						],
@@ -566,7 +916,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8743e881-e155-4361-b4d0-bce5cff3bb28",
+						"id": "383d4024-30c5-451c-9619-5575afed9c11",
 						"exec": [
 							"//var jsonData = JSON.parse(responseBody);",
 							"//pm.variables.set(\"pageId\", jsonData.id);",
@@ -605,13 +955,13 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n \"title\": \"{{revisionKey}}:{{revisionSummary}}\",\n \"type\": \"page\",\n\n \"status\": \"current\",\n \"version\": {\n   \"number\": 2\n },\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
+					"raw": "{\n \"title\": \"{{artifactTitle}}\",\n \"type\": \"page\",\n\n \"status\": \"current\",\n \"version\": {\n   \"number\": {{versionNumber}}\n },\n \"body\":\n    {\"storage\":{\"value\":\n    \"{{PageBody}}\",\n     \"representation\": \"storage\"\n   }}\n}\n\n",
 					"options": {
 						"raw": {}
 					}
 				},
 				"url": {
-					"raw": "https://{{DestUrl}}/wiki/rest/api/content/:id/",
+					"raw": "https://{{DestUrl}}/wiki/rest/api/content/{{artifactPageId}}",
 					"protocol": "https",
 					"host": [
 						"{{DestUrl}}"
@@ -621,14 +971,7 @@
 						"rest",
 						"api",
 						"content",
-						":id",
-						""
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": "{{revisionPageId}}"
-						}
+						"{{artifactPageId}}"
 					]
 				}
 			},
@@ -640,7 +983,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "cff22368-1c86-41bf-b1e4-c81eafc8ed31",
+						"id": "ac974a24-355f-437e-9b40-1c033bb084dc",
 						"exec": [
 							""
 						],
@@ -650,7 +993,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "99660fc7-6b03-4d15-80aa-1c33648202ca",
+						"id": "7ae90947-f2ee-420f-8e49-f51eb58b95b7",
 						"exec": [
 							"//var loopCount = pm.variables.get(\"loopCount\");",
 							"//var numOfLoops =pm.variables.get(\"numOfLoops\");",
@@ -690,7 +1033,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"transition\": {\n    \"id\": \"81\"\n  }\n}",
+					"raw": "{\n  \"transition\": {\n    \"id\": \"61\"\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -721,7 +1064,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "9a2b5626-1451-4fdf-b4de-49c420a3aa9b",
+						"id": "235d04a2-6cdc-4336-add2-5ea3a92a468c",
 						"exec": [
 							"var loopCount = pm.globals.get(\"loopCount\");",
 							"",
