@@ -56,18 +56,16 @@ docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Training/Atlas1
 ```
 
 # ***OPS Artifacts and Revisions***
-<details>
-  <summary>Revison Process</summary>
+
   
-  # Create Revision Confluence pages when Revision ticket is in "Awaiting Page Creation"
+  ### Create Revision Confluence pages when Revision ticket is in "Awaiting Page Creation"
   This is how the Revision sub-task should be created with the Jira Automation turned on within Atlassian in OPS project
   ```
   docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Revisions/CreateRevisions.json -e ./env/UpstartEnv.json
   ```
-  # Merge Revision page back to parent Artifact page
+  ### Merge Revision page back to parent Artifact page
   ```
   docker run -v "$(pwd)":/etc/newman -t postman/newman:4.5.4 run ./Revisions/MergeToMaster.json -e ./env/UpstartEnv.json
   ```
   
 
-</details>
