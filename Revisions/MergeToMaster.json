@@ -50,6 +50,15 @@
 					"script": {
 						"id": "1643d8be-d0b3-48d1-8f3e-e7d2d6abe29d",
 						"exec": [
+							"",
+							"console.log(\"-----                                ------\");",
+							"console.log(\"-----       SCRIPT START              ------\");",
+							"console.log(\"-----                                ------\");",
+							"",
+							"console.log(\"-----Get Revisions Approved to Become Offical ------\");",
+							"",
+							"",
+							"",
 							"pm.globals.set(\"jql\", ",
 							"\"project%20%3D%20OPS%20AND%20issuetype%20%3D%20Revision%20AND%20status%20%3D%20\\\"Approved%20to%20Become%20Official\\\"%20ORDER%20BY%20priority%20DESC\" )"
 						],
@@ -105,6 +114,18 @@
 					"script": {
 						"id": "47b8e244-917c-40e8-ad19-62e06839eb47",
 						"exec": [
+							"console.log(\"-----                                ------\");",
+							"console.log(\"-----Loop For Each Revision ------\");",
+							"console.log(\"-----                                ------\");",
+							"",
+							"",
+							"var loopCount = pm.globals.get(\"loopCount\");",
+							"",
+							"loopCount=loopCount+1;",
+							"pm.globals.set(\"loopCount\",loopCount);",
+							"",
+							"",
+							"",
 							"var loopCount = pm.globals.get(\"loopCount\");",
 							"var numOfLoops =pm.globals.get(\"numOfLoops\");",
 							"var jsonData =pm.globals.get(\"jsonData\");",
@@ -118,38 +139,29 @@
 							"",
 							"",
 							"",
-							"if (loopCount<numOfLoops){",
-							"    //another person record, let's go",
-							"    pm.globals.set(\"artifactKey\",jsonData.issues[loopCount].fields.parent.key)",
-							"    pm.globals.set(\"revisionKey\",jsonData.issues[loopCount].key )",
-							"    pm.globals.set(\"revisionSummary\", jsonData.issues[loopCount].fields.summary)",
+							"if (!(loopCount>numOfLoops)){",
+							"    //Going to Loop",
+							"",
+							"    console.log(loopCount + \" Loop\");",
+							"    console.log(\"of\")",
+							"    console.log(numOfLoops + \" Total Loops\");",
+							"",
+							"    pm.globals.set(\"artifactKey\",jsonData.issues[loopCount-1].fields.parent.key)",
+							"    pm.globals.set(\"revisionKey\",jsonData.issues[loopCount-1].key )",
+							"    pm.globals.set(\"revisionSummary\", jsonData.issues[loopCount-1].fields.summary)",
 							"    ",
 							"    console.log(\"Going through loop for revision and artifact\");",
-							"    console.log(\"Artifact Key: \" + jsonData.issues[loopCount].fields.parent.key)",
-							"    console.log(\"Revision Key: \" + jsonData.issues[loopCount].key)",
-							"    console.log(\"Revision Summary: \" + jsonData.issues[loopCount].fields.summary)",
+							"    console.log(\"Artifact Key: \" + jsonData.issues[loopCount-1].fields.parent.key)",
+							"    console.log(\"Revision Key: \" + jsonData.issues[loopCount-1].key)",
+							"    console.log(\"Revision Summary: \" + jsonData.issues[loopCount-1].fields.summary)",
 							"    ",
 							"    ",
-							"    if (jsonData.issues[loopCount].fields.parent.key !== null){",
-							"    //console.log(issue.fields.assignee.accountId);",
-							"        //postman.setNextRequest(\"Create Atlas 101 Training Checklist\");",
-							"        //pm.globals.set('goto', 'MyRequest');",
-							"    }",
-							"    else",
-							"    {",
-							"        console.log(\"No assignee for\" + jsonData.issues[loopCount].key);",
-							"        postman.setNextRequest(\"Loop For Each Revision\");",
-							"        pm.globals.set('goto', 'MyRequest');",
-							"        loopCount=loopCount+1;",
-							"        pm.globals.set(\"loopCount\",loopCount);",
-							"",
-							"        ",
-							"    }",
+							"   ",
 							"    ",
 							"}",
 							"else",
 							"{",
-							"    console.log(\"End Of Loop\")",
+							"   console.log(\"End Of Loop, Goodbye\")",
 							"    postman.setNextRequest(\"null\");",
 							"    pm.globals.set('goto', 'MyRequest');",
 							"    ",
@@ -226,12 +238,9 @@
 							"  ",
 							"});",
 							"",
-							"// console.log(\"Key array: \" +  keyArray)",
-							"// console.log(\"Webuis: \" +  webuiArray)",
 							"",
 							"",
-							"pm.globals.set(\"loopCount\",0);",
-							"//pm.globals.set(\"numOfLoops\",keyArray.length);",
+							"",
 							"pm.globals.set(\"pageIdArray\",pageIdArray);",
 							"pm.globals.set(\"webuiArray\",webuiArray);",
 							"pm.globals.set(\"artifactTitle\",artifactTitleArray[0] )",
@@ -267,8 +276,7 @@
 					"script": {
 						"id": "cb649a76-f121-4f32-9a0d-afc74bde2d5a",
 						"exec": [
-							"//debugging",
-							"//pm.globals.set(\"revisionKey\", \"OPS-2\");",
+							"console.log(\"-----Locating Confluence Page Of Artifact (to Revise To)------\");",
 							"",
 							"pm.globals.set(\"pageStart\", 0)",
 							"pm.globals.set(\"setLimit\", 500)",
@@ -371,7 +379,7 @@
 							"// console.log(\"Webuis: \" +  webuiArray)",
 							"",
 							"",
-							"pm.globals.set(\"loopCount\",0);",
+							"//pm.globals.set(\"loopCount\",0);",
 							"//pm.globals.set(\"numOfLoops\",keyArray.length);",
 							"pm.globals.set(\"pageIdArray\",pageIdArray);",
 							"pm.globals.set(\"webuiArray\",webuiArray);",
@@ -405,8 +413,7 @@
 					"script": {
 						"id": "e9e4894b-dd2b-4a05-9bd4-5e902c268369",
 						"exec": [
-							"//debugging",
-							"//pm.globals.set(\"revisionKey\", \"OPS-2\");",
+							"console.log(\"-----Locating Confluence Page Of Revision)------\");",
 							"",
 							"pm.globals.set(\"pageStart\", 0)",
 							"pm.globals.set(\"setLimit\", 500)",
@@ -473,20 +480,7 @@
 					"script": {
 						"id": "b5c61119-d00c-4a19-95ec-81f467dd7484",
 						"exec": [
-							"//pm.globals.set(\"parentPageId\",null)",
-							"console.log(pm.globals.get(\"parentPageId\"));",
-							"if(pm.globals.get(\"parentPageId\") == null){",
-							"    ",
-							"    console.log(\"No parent Id provided, use Space Home Page as parent\");",
-							"    ",
-							"    //var parentPageId = pm.globals.get(\"homePageId\");",
-							"    pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
-							"    //pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") );",
-							"    //console.log(parentPageId);",
-							"    console.log(pm.globals.get(\"parentPageId\"));",
-							"}",
-							"",
-							"//pm.globals.set(\"parentPageId\", pm.globals.get(\"homePageId\") )"
+							"console.log(\"-----Copy Revision Over Artifact------\");"
 						],
 						"type": "text/javascript"
 					}
@@ -572,6 +566,8 @@
 					"script": {
 						"id": "9524e566-652e-48a2-97a0-55e2012cef1d",
 						"exec": [
+							"",
+							"console.log(\"-----Getting Confluence Version------\");",
 							"//testing",
 							"//pm.globals.set(\"testPageId\",375655773 )",
 							"//pm.globals.set(\"testPageId\",528286164 )"
@@ -748,7 +744,7 @@
 					"script": {
 						"id": "4b833ac4-e173-42e7-9f2f-5c0d710fd2aa",
 						"exec": [
-							"//pm.globals.set(\"revisionPageId\",393971351 )",
+							"console.log(\"-----Get New Header For Artifact Prepared-----\");",
 							"",
 							"//stripping out Revision control header",
 							"pm.globals.set(\"stripPatterns\",\"[\\\\s\\\\S]+for Controlled Document. <\\/span><\\/p>\\n?<hr \\/>\")",
@@ -844,7 +840,7 @@
 					"script": {
 						"id": "7f339d7c-67ff-452f-9777-513e6cb4f599",
 						"exec": [
-							"",
+							"console.log(\"-----Get Page Version So we Can Increment------\");",
 							"",
 							"",
 							""
@@ -908,7 +904,7 @@
 					"script": {
 						"id": "fa7c9077-1011-457e-8534-f0642414a0dc",
 						"exec": [
-							""
+							"console.log(\"-----Update Artifact Page With new Header------\");"
 						],
 						"type": "text/javascript"
 					}
@@ -995,12 +991,7 @@
 					"script": {
 						"id": "7ae90947-f2ee-420f-8e49-f51eb58b95b7",
 						"exec": [
-							"//var loopCount = pm.variables.get(\"loopCount\");",
-							"//var numOfLoops =pm.variables.get(\"numOfLoops\");",
-							"//var jsonData =pm.variables.get(\"jsonData\");",
-							"//console.log(loopCount);",
-							"//console.log(numOfLoops);",
-							"",
+							"console.log(\"-----Transition Revision Status-----\");",
 							""
 						],
 						"type": "text/javascript"
@@ -1066,13 +1057,8 @@
 					"script": {
 						"id": "235d04a2-6cdc-4336-add2-5ea3a92a468c",
 						"exec": [
-							"var loopCount = pm.globals.get(\"loopCount\");",
-							"",
-							"loopCount=loopCount+1;",
-							" pm.globals.set(\"loopCount\",loopCount);",
-							"",
-							" postman.setNextRequest(\"Loop For Each Revision\");",
-							" pm.globals.set('goto', 'MyRequest');"
+							"postman.setNextRequest(\"Loop For Each Revision\");",
+							"pm.globals.set('goto', 'MyRequest');"
 						],
 						"type": "text/javascript"
 					}
